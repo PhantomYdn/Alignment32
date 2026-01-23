@@ -137,7 +137,13 @@
           </div>
 
           <!-- Review Step (4) -->
-          <div v-else key="review">
+          <div 
+            v-else 
+            key="review"
+            ref="reviewScreen"
+            @keydown.enter="nextStep"
+            tabindex="0"
+          >
             <div class="mb-6">
               <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-800 mb-3 tracking-tight">Review Your Words</h2>
               <p class="text-gray-600 text-base sm:text-lg leading-relaxed">
@@ -474,9 +480,15 @@ export default {
     focusFirstInput() {
       // Wait for transition to complete (300ms animation + buffer)
       setTimeout(() => {
-        const inputs = this.$el.querySelectorAll('input[type="text"]')
-        if (inputs[0]) {
-          inputs[0].focus()
+        if (this.currentStep === 4 && this.$refs.reviewScreen) {
+          // Review screen - focus the container for Enter key support
+          this.$refs.reviewScreen.focus()
+        } else {
+          // Category steps - focus first input
+          const inputs = this.$el.querySelectorAll('input[type="text"]')
+          if (inputs[0]) {
+            inputs[0].focus()
+          }
         }
       }, 350)
     },
