@@ -489,30 +489,59 @@ export default {
       return value && value.trim() !== '' ? value.trim() : null
     },
     onAssociationInput() {
-      this.$nextTick(() => {
-        if (this.getWordPairAssociation(this.currentWordIndex)) {
-          this.focusNextInput(this.currentWordIndex)
+      // Visual updates (checkmarks) are handled reactively
+      // Navigation only happens on Enter key press (matching WordEntry pattern)
+    },
+    focusFirstInput() {
+      // Wait for any transitions/DOM updates
+      setTimeout(() => {
+        const inputs = this.$el.querySelectorAll('input[type="text"]')
+        if (inputs[0]) {
+          inputs[0].focus()
         }
-      })
+      }, 100)
+    },
+    scrollToTopAndFocus() {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      this.focusFirstInput()
     },
     focusNextInput(currentIdx) {
+      // Find next unfilled input in current pair
       for (let i = currentIdx + 1; i < this.associationCount; i++) {
         if (!this.getWordPairAssociation(i)) {
           this.currentWordIndex = i
+          this.$nextTick(() => {
+            const inputs = this.$el.querySelectorAll('input[type="text"]')
+            if (inputs[i]) {
+              inputs[i].focus()
+            }
+          })
           return
         }
       }
+      // Check before current position
       for (let i = 0; i < currentIdx; i++) {
         if (!this.getWordPairAssociation(i)) {
           this.currentWordIndex = i
+          this.$nextTick(() => {
+            const inputs = this.$el.querySelectorAll('input[type="text"]')
+            if (inputs[i]) {
+              inputs[i].focus()
+            }
+          })
           return
         }
+      }
+      // All filled - advance to next pair if possible
+      if (this.isCurrentPairComplete && !this.isLastPairInRound) {
+        this.nextPair()
       }
     },
     previousPair() {
       if (this.currentPairIndex > 0) {
         this.currentPairIndex--
         this.currentWordIndex = 0
+        this.scrollToTopAndFocus()
       }
     },
     handleNextAction() {
@@ -528,6 +557,7 @@ export default {
       if (this.currentPairIndex < this.totalPairsInRound - 1) {
         this.currentPairIndex++
         this.currentWordIndex = 0
+        this.scrollToTopAndFocus()
       }
     },
     finishRound() {
@@ -609,6 +639,7 @@ export default {
       this.currentPairIndex = 0
       this.currentWordIndex = 0
       this.pairAssociations = {}
+      this.scrollToTopAndFocus()
     },
     createMergedGroupName(name1, name2) {
       const getBase = (name) => {

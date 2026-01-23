@@ -30,7 +30,7 @@
         :groups="currentGroups"
         :initial-word-history="currentSession.wordHistory"
         @associations-complete="onAssociationsComplete"
-        @back="currentView = 'word-entry'"
+        @back="currentView = 'home'"
       />
       <SessionDetail
         v-else-if="currentView === 'session-detail'"

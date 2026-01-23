@@ -470,12 +470,25 @@ export default {
         this.nextStep()
       }
     },
+    focusFirstInput() {
+      // Wait for transition to complete (300ms animation + buffer)
+      setTimeout(() => {
+        const inputs = this.$el.querySelectorAll('input[type="text"]')
+        if (inputs[0]) {
+          inputs[0].focus()
+        }
+      }, 350)
+    },
     nextStep() {
       if (!this.canProceed) return
       
       if (this.currentStep < 4) {
         this.transitionDirection = 'forward'
         this.currentStep++
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+          this.focusFirstInput()
+        })
       } else {
         this.submitWords()
       }
@@ -484,6 +497,10 @@ export default {
       if (this.currentStep > 0) {
         this.transitionDirection = 'backward'
         this.currentStep--
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+          this.focusFirstInput()
+        })
       }
     },
     goToCategory(categoryName) {
