@@ -7,31 +7,42 @@
     >
       <!-- Step circle and label -->
       <div class="flex flex-col items-center">
-        <!-- Circle indicator -->
-        <div 
+        <!-- Circle indicator with touch-friendly wrapper -->
+        <button 
+          type="button"
           :class="[
-            'w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-300',
-            getStepClasses(index)
+            'min-w-[44px] min-h-[44px] flex items-center justify-center',
+            index <= currentStep ? 'cursor-pointer' : 'cursor-default'
           ]"
+          :aria-label="`Step ${index + 1}: ${step.name}${index < currentStep ? ' (completed)' : index === currentStep ? ' (current)' : ''}`"
+          :aria-current="index === currentStep ? 'step' : undefined"
+          @click="$emit('step-click', index)"
         >
-          <!-- Checkmark for completed -->
-          <svg 
-            v-if="index < currentStep" 
-            class="w-4 h-4 sm:w-5 sm:h-5" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
+          <div 
+            :class="[
+              'w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-300',
+              getStepClasses(index)
+            ]"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-          </svg>
-          <!-- Number for current and future -->
-          <span v-else>{{ index + 1 }}</span>
-        </div>
+            <!-- Checkmark for completed -->
+            <svg 
+              v-if="index < currentStep" 
+              class="w-4 h-4 sm:w-5 sm:h-5" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+            </svg>
+            <!-- Number for current and future -->
+            <span v-else>{{ index + 1 }}</span>
+          </div>
+        </button>
         
         <!-- Step label (hidden on very small screens) -->
         <span 
           :class="[
-            'text-xs mt-1.5 font-medium transition-colors duration-300 hidden sm:block',
+            'text-xs mt-0.5 font-medium transition-colors duration-300 hidden sm:block',
             getLabelClasses(index)
           ]"
         >
@@ -42,10 +53,10 @@
       <!-- Connector line (not after last step) - vertically centered -->
       <div 
         v-if="index < steps.length - 1"
-        class="flex items-center h-8 sm:h-10"
+        class="flex items-center h-[44px] sm:h-[44px]"
       >
         <div 
-          class="w-6 sm:w-10 md:w-16 h-0.5 mx-1 sm:mx-2 rounded-full bg-gray-200 transition-all duration-500"
+          class="w-4 sm:w-8 md:w-12 h-0.5 rounded-full bg-gray-200 transition-all duration-500"
         ></div>
       </div>
     </div>
@@ -66,6 +77,7 @@ export default {
       required: true
     }
   },
+  emits: ['step-click'],
   data() {
     return {
       stepColors: {

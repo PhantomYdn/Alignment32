@@ -3,16 +3,25 @@
     <div 
       v-if="isVisible"
       class="fixed inset-0 z-[100] isolate"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="welcome-modal-title"
+      @keydown.escape="handleEscape"
+      @keydown.tab="handleTab"
     >
       <!-- Backdrop -->
       <div 
         class="absolute inset-0 bg-black/50 backdrop-blur-sm"
         @click="handleBackdropClick"
+        aria-hidden="true"
       ></div>
       
       <!-- Modal Container -->
       <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
-        <div class="bg-white rounded-3xl shadow-soft-lg w-full max-w-lg max-h-[90vh] overflow-hidden pointer-events-auto relative animate-scale-in">
+        <div 
+          ref="modalContent"
+          class="bg-white rounded-3xl shadow-soft-lg w-full max-w-lg max-h-[90vh] overflow-hidden pointer-events-auto relative animate-scale-in"
+        >
           <!-- Slide Content -->
           <div class="relative w-full overflow-hidden">
             <div 
@@ -22,10 +31,10 @@
               <!-- Slide 1: What is Alignment32? -->
               <div class="w-full min-w-full flex-shrink-0 p-6 sm:p-8">
                 <div class="text-center">
-                  <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-brand-100 to-spiritual-100 flex items-center justify-center mx-auto mb-4">
+                  <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-brand-100 to-spiritual-100 flex items-center justify-center mx-auto mb-4" aria-hidden="true">
                     <span class="text-3xl sm:text-4xl font-extrabold text-brand-600">32</span>
                   </div>
-                  <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-800 mb-4">What is Alignment32?</h2>
+                  <h2 id="welcome-modal-title" class="text-2xl sm:text-3xl font-extrabold text-gray-800 mb-4">What is Alignment32?</h2>
                   <p class="text-gray-600 text-base sm:text-lg leading-relaxed">
                     Alignment32 is a reflective practice that helps you discover your core values 
                     and priorities through word association.
@@ -122,20 +131,25 @@
 
           <!-- Navigation -->
           <div class="px-6 sm:px-8 pb-6 sm:pb-8">
-            <!-- Dot indicators -->
-            <div class="flex justify-center gap-2 mb-6">
+            <!-- Dot indicators with touch-friendly targets -->
+            <div class="flex justify-center gap-1 mb-6">
               <button
                 v-for="(_, index) in slides"
                 :key="index"
                 @click="currentSlide = index"
-                :class="[
-                  'h-2.5 rounded-full transition-all duration-200',
-                  currentSlide === index 
-                    ? 'bg-brand-500 w-6' 
-                    : 'bg-gray-300 hover:bg-gray-400 w-2.5'
-                ]"
+                class="min-w-[44px] min-h-[44px] flex items-center justify-center"
                 :aria-label="`Go to slide ${index + 1}`"
-              ></button>
+                :aria-current="currentSlide === index ? 'true' : undefined"
+              >
+                <span 
+                  :class="[
+                    'h-2.5 rounded-full transition-all duration-200',
+                    currentSlide === index 
+                      ? 'bg-brand-500 w-6' 
+                      : 'bg-gray-300 hover:bg-gray-400 w-2.5'
+                  ]"
+                ></span>
+              </button>
             </div>
 
             <!-- Buttons -->
@@ -143,7 +157,7 @@
               <button
                 v-if="currentSlide > 0"
                 @click="previousSlide"
-                class="px-4 py-2.5 text-gray-600 hover:text-gray-800 font-semibold transition-colors"
+                class="min-h-[44px] px-4 py-2.5 text-gray-600 hover:text-gray-800 font-semibold transition-colors rounded-xl hover:bg-gray-100"
               >
                 Back
               </button>
@@ -152,14 +166,14 @@
               <button
                 v-if="currentSlide < slides.length - 1"
                 @click="nextSlide"
-                class="px-6 py-2.5 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-xl font-semibold hover:from-brand-600 hover:to-brand-700 transition-all shadow-md hover:shadow-glow"
+                class="min-h-[44px] px-6 py-2.5 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-xl font-semibold hover:from-brand-600 hover:to-brand-700 transition-all shadow-md hover:shadow-glow"
               >
                 Next
               </button>
               <button
                 v-else
                 @click="complete"
-                class="px-6 py-2.5 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-xl font-semibold hover:from-brand-600 hover:to-brand-700 transition-all shadow-md hover:shadow-glow"
+                class="min-h-[44px] px-6 py-2.5 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-xl font-semibold hover:from-brand-600 hover:to-brand-700 transition-all shadow-md hover:shadow-glow"
               >
                 Get Started
               </button>
@@ -206,6 +220,7 @@ export default {
   mounted() {
     if (this.forceShow) {
       this.isVisible = true
+      this.$nextTick(() => this.focusFirstElement())
     } else {
       this.checkShouldShow()
     }
@@ -215,6 +230,12 @@ export default {
       if (newVal) {
         this.isVisible = true
         this.currentSlide = 0
+        this.$nextTick(() => this.focusFirstElement())
+      }
+    },
+    isVisible(newVal) {
+      if (newVal) {
+        this.$nextTick(() => this.focusFirstElement())
       }
     }
   },
@@ -247,6 +268,40 @@ export default {
       if (hasSeenOnboarding || this.forceShow) {
         this.isVisible = false
         this.$emit('close')
+      }
+    },
+    handleEscape() {
+      const hasSeenOnboarding = localStorage.getItem(STORAGE_KEY)
+      if (hasSeenOnboarding || this.forceShow) {
+        this.isVisible = false
+        this.$emit('close')
+      }
+    },
+    handleTab(event) {
+      // Focus trap - keep focus within modal
+      if (!this.$refs.modalContent) return
+      
+      const focusableElements = this.$refs.modalContent.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      const firstElement = focusableElements[0]
+      const lastElement = focusableElements[focusableElements.length - 1]
+      
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault()
+        lastElement.focus()
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault()
+        firstElement.focus()
+      }
+    },
+    focusFirstElement() {
+      if (!this.$refs.modalContent) return
+      const focusableElements = this.$refs.modalContent.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      if (focusableElements.length > 0) {
+        focusableElements[0].focus()
       }
     }
   }

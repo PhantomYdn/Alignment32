@@ -7,17 +7,18 @@
         <div class="flex items-center justify-between py-3">
           <button 
             @click="handleBack"
-            class="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700"
+            class="min-w-[44px] min-h-[44px] p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700 flex items-center justify-center"
+            aria-label="Go back"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
           <h1 class="text-xl sm:text-2xl font-bold text-gray-800 tracking-tight">Enter Your Words</h1>
-          <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
+          <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-500" aria-live="polite" aria-atomic="true">
             <transition name="fade">
               <span v-if="showDraftSaved" class="text-emerald-600 font-medium draft-saved-pulse flex items-center gap-1">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
                 Saved

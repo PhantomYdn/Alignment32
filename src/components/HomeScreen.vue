@@ -61,22 +61,51 @@
             <!-- Delete button -->
             <button
               @click.stop="confirmDelete(session)"
-              class="absolute top-3 right-3 p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all duration-200"
-              title="Delete session"
+              class="absolute top-2 right-2 min-w-[44px] min-h-[44px] p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center"
+              aria-label="Delete session"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
             </button>
 
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 pr-8">
               <div class="flex-1 min-w-0">
-                <!-- Session title and status -->
+                <!-- Session title (inline editable) and status -->
                 <div class="flex items-center gap-2 mb-1.5">
-                  <h3 class="font-bold text-gray-800 text-sm sm:text-base">
-                    Session {{ formatDate(session.createdAt) }}
-                  </h3>
-                  <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold', getStatusClasses(session)]">
+                  <div class="flex items-center gap-1.5 flex-1 min-w-0">
+                    <input
+                      v-if="editingSessionId === session.id"
+                      ref="nameInput"
+                      v-model="editingName"
+                      type="text"
+                      maxlength="50"
+                      class="font-bold text-gray-800 text-sm sm:text-base bg-white border-2 border-brand-300 rounded-lg px-2 py-0.5 focus:outline-none focus:ring-2 focus:ring-brand-200 min-w-0 flex-1"
+                      @click.stop
+                      @blur="saveSessionName(session)"
+                      @keydown.enter="saveSessionName(session)"
+                      @keydown.escape="cancelEditing"
+                    />
+                    <h3 
+                      v-else
+                      class="font-bold text-gray-800 text-sm sm:text-base truncate cursor-text hover:text-brand-600 transition-colors"
+                      @click.stop="startEditingName(session)"
+                      :title="session.name || `Session ${formatDate(session.createdAt)}`"
+                    >
+                      {{ session.name || `Session ${formatDate(session.createdAt)}` }}
+                    </h3>
+                    <button
+                      v-if="editingSessionId !== session.id"
+                      @click.stop="startEditingName(session)"
+                      class="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors opacity-0 group-hover:opacity-100 flex-shrink-0"
+                      aria-label="Edit session name"
+                    >
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </button>
+                  </div>
+                  <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold flex-shrink-0', getStatusClasses(session)]">
                     {{ getStatusText(session) }}
                   </span>
                 </div>
@@ -90,6 +119,22 @@
                     Created {{ formatDateTime(session.createdAt) }}
                   </span>
                 </p>
+
+                <!-- Word preview (show first few words from session) -->
+                <div v-if="getWordPreview(session).length > 0" class="mb-3">
+                  <div class="flex flex-wrap gap-1.5">
+                    <span 
+                      v-for="(word, idx) in getWordPreview(session)" 
+                      :key="idx"
+                      class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs font-medium"
+                    >
+                      {{ word }}
+                    </span>
+                    <span v-if="getWordCount(session) > 4" class="text-xs text-gray-400 self-center">
+                      +{{ getWordCount(session) - 4 }} more
+                    </span>
+                  </div>
+                </div>
 
                 <!-- Draft progress -->
                 <div v-if="session.isDraft" class="mb-3">
@@ -184,10 +229,12 @@ export default {
       default: () => []
     }
   },
-  emits: ['create-session', 'open-session', 'delete-session', 'show-welcome'],
+  emits: ['create-session', 'open-session', 'delete-session', 'update-session-name', 'show-welcome'],
   data() {
     return {
-      sessionToDelete: null
+      sessionToDelete: null,
+      editingSessionId: null,
+      editingName: ''
     }
   },
   computed: {
@@ -261,6 +308,41 @@ export default {
         this.$emit('delete-session', this.sessionToDelete.id)
         this.sessionToDelete = null
       }
+    },
+    startEditingName(session) {
+      this.editingSessionId = session.id
+      this.editingName = session.name || `Session ${this.formatDate(session.createdAt)}`
+      this.$nextTick(() => {
+        if (this.$refs.nameInput) {
+          this.$refs.nameInput.focus()
+          this.$refs.nameInput.select()
+        }
+      })
+    },
+    saveSessionName(session) {
+      const trimmedName = this.editingName.trim()
+      if (trimmedName && trimmedName !== session.name) {
+        this.$emit('update-session-name', session.id, trimmedName)
+      }
+      this.editingSessionId = null
+      this.editingName = ''
+    },
+    cancelEditing() {
+      this.editingSessionId = null
+      this.editingName = ''
+    },
+    getWordPreview(session) {
+      if (!session.initialWords) return []
+      const allWords = Object.values(session.initialWords)
+        .flat()
+        .filter(word => word && word.trim())
+      return allWords.slice(0, 4)
+    },
+    getWordCount(session) {
+      if (!session.initialWords) return 0
+      return Object.values(session.initialWords)
+        .flat()
+        .filter(word => word && word.trim()).length
     }
   }
 }

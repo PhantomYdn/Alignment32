@@ -1,40 +1,45 @@
 <template>
-  <div class="container mx-auto px-4 py-6 sm:py-8">
-    <div class="max-w-4xl mx-auto">
-      <!-- Header -->
-      <div class="flex items-center mb-6 sm:mb-8">
-        <button 
-          @click="$emit('back')"
-          class="mr-3 sm:mr-4 p-2.5 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 transition-all duration-200 shadow-sm"
-        >
-          <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800 tracking-tight">Session Details</h1>
+  <div class="min-h-screen flex flex-col">
+    <!-- Sticky Header -->
+    <div class="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
+      <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto flex items-center justify-between py-3">
+          <div class="flex items-center">
+            <button 
+              @click="$emit('back')"
+              class="mr-3 sm:mr-4 min-w-[44px] min-h-[44px] p-2.5 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 transition-all duration-200 shadow-sm flex items-center justify-center"
+              aria-label="Go back"
+            >
+              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <h1 class="text-xl sm:text-2xl font-extrabold text-gray-800 tracking-tight">Session Details</h1>
+          </div>
+          <span 
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold"
+            :class="session.finalWord ? 'bg-emerald-100 text-emerald-700' : 'bg-physical-100 text-physical-700'"
+          >
+            <span :class="session.finalWord ? 'w-1.5 h-1.5 rounded-full bg-emerald-500' : 'w-1.5 h-1.5 rounded-full bg-physical-500'"></span>
+            {{ session.finalWord ? 'Completed' : 'In Progress' }}
+          </span>
+        </div>
       </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 container mx-auto px-4 py-6 sm:py-8">
+      <div class="max-w-4xl mx-auto">
 
       <!-- Session Overview Card -->
       <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-gray-100 p-5 sm:p-6 mb-6">
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-4">
-          <div class="flex-1 min-w-0">
-            <h2 class="text-xl sm:text-2xl font-bold text-gray-800">
-              Session {{ new Date(session.createdAt).toLocaleDateString() }}
-            </h2>
-            <p class="text-sm text-gray-500 mt-1">
-              Created {{ new Date(session.createdAt).toLocaleString() }}
-            </p>
-          </div>
-          <div class="flex-shrink-0">
-            <span 
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold"
-              :class="session.finalWord ? 'bg-emerald-100 text-emerald-700' : 'bg-physical-100 text-physical-700'"
-            >
-              <span v-if="session.finalWord" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              <span v-else class="w-1.5 h-1.5 rounded-full bg-physical-500"></span>
-              {{ session.finalWord ? 'Completed' : 'In Progress' }}
-            </span>
-          </div>
+        <div class="mb-2">
+          <h2 class="text-xl sm:text-2xl font-bold text-gray-800">
+            {{ session.name || `Session ${new Date(session.createdAt).toLocaleDateString()}` }}
+          </h2>
+          <p class="text-sm text-gray-500 mt-1">
+            Created {{ new Date(session.createdAt).toLocaleString() }}
+          </p>
         </div>
         
         <!-- Final Word Display -->
@@ -116,6 +121,7 @@
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   </div>

@@ -279,6 +279,11 @@ a:hover {
    TYPOGRAPHY ENHANCEMENTS
    ============================ */
 
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
 /* Smooth font rendering */
 body {
   -webkit-font-smoothing: antialiased;

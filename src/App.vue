@@ -11,6 +11,7 @@
         @create-session="startNewSession"
         @open-session="openSession"
         @delete-session="deleteSession"
+        @update-session-name="updateSessionName"
         @show-welcome="showWelcomeModal = true"
         :sessions="sessions"
       />
@@ -73,9 +74,11 @@ export default {
   methods: {
     startNewSession() {
       const sessionId = Date.now()
+      const createdAt = new Date().toISOString()
       this.currentSession = {
         id: sessionId,
-        createdAt: new Date().toISOString(),
+        name: `Session ${new Date(createdAt).toLocaleDateString()}`,
+        createdAt: createdAt,
         initialWords: {},
         wordHistory: [],
         associations: [],
@@ -212,6 +215,14 @@ export default {
       localStorage.setItem('alignment32-sessions', JSON.stringify(this.sessions))
       // Also clear any draft
       drafts.clear(sessionId)
+    },
+    updateSessionName(sessionId, newName) {
+      const session = this.sessions.find(s => s.id === sessionId)
+      if (session) {
+        session.name = newName
+        session.lastModified = new Date().toISOString()
+        localStorage.setItem('alignment32-sessions', JSON.stringify(this.sessions))
+      }
     },
     loadSessions() {
       const saved = localStorage.getItem('alignment32-sessions')

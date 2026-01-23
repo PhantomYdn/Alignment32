@@ -1,21 +1,35 @@
 <template>
-  <div class="container mx-auto px-4 py-6 sm:py-8">
-    <div class="max-w-2xl mx-auto">
-      <!-- Header -->
-      <div class="flex items-center mb-6">
-        <button 
-          @click="$emit('back')"
-          class="mr-3 p-2 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 transition-all duration-200 shadow-sm"
-        >
-          <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <div>
-          <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800 tracking-tight">Association Process</h1>
-          <p class="text-base text-gray-500 font-medium">Round {{ currentRound }}</p>
+  <div class="min-h-screen flex flex-col">
+    <!-- Sticky Header -->
+    <div class="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
+      <div class="container mx-auto px-4">
+        <div class="max-w-2xl mx-auto flex items-center justify-between py-3">
+          <div class="flex items-center">
+            <button 
+              @click="$emit('back')"
+              class="mr-3 min-w-[44px] min-h-[44px] p-2 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 transition-all duration-200 shadow-sm flex items-center justify-center"
+              aria-label="Go back"
+            >
+              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div>
+              <h1 class="text-xl sm:text-2xl font-extrabold text-gray-800 tracking-tight">Association Process</h1>
+              <p class="text-sm text-gray-500 font-medium">Round {{ currentRound }}</p>
+            </div>
+          </div>
+          <div class="text-right" aria-live="polite" aria-atomic="true">
+            <span class="text-sm font-bold text-brand-600">{{ overallProgressPercent }}%</span>
+            <p class="text-xs text-gray-400">complete</p>
+          </div>
         </div>
       </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 container mx-auto px-4 py-6">
+      <div class="max-w-2xl mx-auto">
 
       <!-- Main content - One pair at a time -->
       <div v-if="currentGroups.length > 1 || (currentGroups.length === 1 && currentGroups[0].words.length > 1)">
@@ -140,12 +154,12 @@
           </div>
         </div>
 
-        <!-- Navigation and actions -->
-        <div class="flex items-center justify-between gap-4">
+        <!-- Navigation visible on larger screens (inline) -->
+        <div class="hidden sm:flex items-center justify-between gap-4">
           <button
             v-if="currentPairIndex > 0"
             @click="previousPair"
-            class="px-5 py-3 text-gray-600 hover:text-gray-800 font-semibold transition-colors flex items-center gap-2 bg-white rounded-xl border border-gray-200 hover:border-gray-300 shadow-sm"
+            class="min-h-[44px] px-5 py-3 text-gray-600 hover:text-gray-800 font-semibold transition-colors flex items-center gap-2 bg-white rounded-xl border border-gray-200 hover:border-gray-300 shadow-sm"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -158,7 +172,7 @@
             @click="handleNextAction"
             :disabled="!isCurrentPairComplete"
             :class="[
-              'px-6 py-3 rounded-xl font-bold transition-all duration-200 flex items-center gap-2',
+              'min-h-[44px] px-6 py-3 rounded-xl font-bold transition-all duration-200 flex items-center gap-2',
               isCurrentPairComplete
                 ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-md hover:shadow-glow hover:-translate-y-0.5 active:scale-95'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -247,12 +261,52 @@
           Complete Session
         </button>
       </div>
+      </div>
+    </div>
+
+    <!-- Sticky Footer Navigation for Mobile -->
+    <div 
+      v-if="!finalWord && (currentGroups.length > 1 || (currentGroups.length === 1 && currentGroups[0].words.length > 1))"
+      class="sm:hidden sticky bottom-0 bg-white/90 backdrop-blur-md border-t border-gray-100 shadow-lg"
+    >
+      <div class="container mx-auto px-4 py-4">
+        <div class="flex items-center justify-between gap-3">
+          <button
+            v-if="currentPairIndex > 0"
+            @click="previousPair"
+            class="min-h-[44px] px-4 py-3 text-gray-600 hover:text-gray-800 font-semibold transition-colors flex items-center gap-2 bg-white rounded-xl border border-gray-200"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span class="sr-only sm:not-sr-only">Previous</span>
+          </button>
+          <div v-else></div>
+
+          <button
+            @click="handleNextAction"
+            :disabled="!isCurrentPairComplete"
+            :class="[
+              'flex-1 min-h-[44px] px-4 py-3 rounded-xl font-bold transition-all duration-200 flex items-center justify-center gap-2',
+              isCurrentPairComplete
+                ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-md active:scale-95'
+                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            ]"
+          >
+            {{ nextButtonText }}
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import confetti from 'canvas-confetti'
+// Lazy load confetti only when needed
+let confetti = null
 
 export default {
   name: 'Association',
@@ -374,7 +428,13 @@ export default {
     this.initializeProcess()
   },
   methods: {
-    triggerCelebration() {
+    async triggerCelebration() {
+      // Lazy load confetti library only when needed
+      if (!confetti) {
+        const module = await import('canvas-confetti')
+        confetti = module.default
+      }
+      
       // Fire confetti from both sides
       const duration = 3000
       const animationEnd = Date.now() + duration
