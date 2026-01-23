@@ -23,7 +23,9 @@ src/
     ├── HomeScreen.vue   # Session list, create new session
     ├── WordEntry.vue    # 32-word input form (8 per category)
     ├── Association.vue  # Word pairing and merging logic
-    └── SessionDetail.vue # Read-only completed session view
+    ├── SessionDetail.vue # Read-only completed session view
+    ├── StepIndicator.vue # Progress stepper with category colors
+    └── WelcomeModal.vue  # First-time user onboarding modal
 ```
 
 ## Code Standards
