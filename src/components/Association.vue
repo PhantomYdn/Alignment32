@@ -190,8 +190,11 @@
           <transition name="fade">
             <div 
               v-if="showRoundSummary" 
+              ref="roundSummaryModal"
               class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
               @click.self="proceedToNextRound"
+              @keydown.enter="proceedToNextRound"
+              tabindex="0"
             >
               <div class="bg-white rounded-2xl shadow-soft-lg max-w-md w-full p-6 sm:p-8 relative z-10 animate-scale-in">
                 <div class="text-center mb-6">
@@ -234,7 +237,13 @@
       </div>
 
       <!-- Final result - shown when we have exactly 1 word remaining -->
-      <div v-else-if="finalWord" class="bg-gradient-to-br from-brand-50 via-spiritual-50 to-emotional-50 rounded-3xl shadow-soft-lg border border-brand-100 p-8 sm:p-12 text-center">
+      <div 
+        v-else-if="finalWord" 
+        ref="finalWordScreen"
+        class="bg-gradient-to-br from-brand-50 via-spiritual-50 to-emotional-50 rounded-3xl shadow-soft-lg border border-brand-100 p-8 sm:p-12 text-center"
+        @keydown.enter="completeProcess"
+        tabindex="0"
+      >
         <div class="relative mb-8">
           <div class="w-24 h-24 rounded-full bg-gradient-to-br from-brand-500 to-spiritual-500 flex items-center justify-center mx-auto shadow-glow animate-celebration-glow">
             <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -420,12 +429,25 @@ export default {
       if (newValue) {
         this.$nextTick(() => {
           this.triggerCelebration()
+          if (this.$refs.finalWordScreen) {
+            this.$refs.finalWordScreen.focus()
+          }
+        })
+      }
+    },
+    showRoundSummary(newValue) {
+      if (newValue) {
+        this.$nextTick(() => {
+          if (this.$refs.roundSummaryModal) {
+            this.$refs.roundSummaryModal.focus()
+          }
         })
       }
     }
   },
   mounted() {
     this.initializeProcess()
+    this.focusFirstInput()
   },
   methods: {
     async triggerCelebration() {
@@ -532,9 +554,13 @@ export default {
           return
         }
       }
-      // All filled - advance to next pair if possible
-      if (this.isCurrentPairComplete && !this.isLastPairInRound) {
-        this.nextPair()
+      // All filled - advance to next pair or finish round
+      if (this.isCurrentPairComplete) {
+        if (this.isLastPairInRound) {
+          this.finishRound()
+        } else {
+          this.nextPair()
+        }
       }
     },
     previousPair() {
