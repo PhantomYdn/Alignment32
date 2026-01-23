@@ -413,6 +413,7 @@ export default {
         this.words[cat].push('')
       }
     })
+    this.focusFirstInput()
   },
   methods: {
     getCategoryProgress(categoryName) {
