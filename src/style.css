@@ -1,3 +1,71 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Step transition - slide left/right between steps */
+.step-slide-enter-active,
+.step-slide-leave-active {
+  transition: all 0.3s ease;
+}
+
+.step-slide-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.step-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+/* Reverse direction for going back */
+.step-slide-reverse-enter-from {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.step-slide-reverse-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+/* Fade transition for general elements */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Expand/collapse transition for review sections */
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  opacity: 0;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.expand-enter-to,
+.expand-leave-from {
+  max-height: 500px;
+}
+
+/* Draft saved indicator pulse */
+@keyframes draft-saved-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.draft-saved-pulse {
+  animation: draft-saved-pulse 1s ease-in-out;
+}

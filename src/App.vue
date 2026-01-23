@@ -4,13 +4,16 @@
       v-if="currentView === 'home'"
       @create-session="startNewSession"
       @open-session="openSession"
+      @delete-session="deleteSession"
       :sessions="sessions"
     />
     <WordEntry
       v-if="currentView === 'word-entry'"
       :existing-words="currentSession ? currentSession.initialWords : {}"
+      :session-id="currentSession ? currentSession.id : null"
       @words-complete="onWordsComplete"
-      @back="currentView = 'home'"
+      @draft-update="onDraftUpdate"
+      @back="handleWordEntryBack"
     />
     <Association
       v-if="currentView === 'association'"
@@ -32,6 +35,7 @@ import HomeScreen from './components/HomeScreen.vue'
 import WordEntry from './components/WordEntry.vue'
 import Association from './components/Association.vue'
 import SessionDetail from './components/SessionDetail.vue'
+import { drafts } from './utils/storage.js'
 
 export default {
   name: 'App',
@@ -54,40 +58,94 @@ export default {
   },
   methods: {
     startNewSession() {
+      const sessionId = Date.now()
       this.currentSession = {
-        id: Date.now(),
-        createdAt: new Date(),
+        id: sessionId,
+        createdAt: new Date().toISOString(),
         initialWords: {},
         wordHistory: [],
         associations: [],
-        finalWord: null
+        finalWord: null,
+        lastModified: new Date().toISOString(),
+        isDraft: true
+      }
+      // Check if there's an existing draft for any reason
+      const existingDraft = drafts.load(sessionId)
+      if (existingDraft && existingDraft.words) {
+        this.currentSession.initialWords = existingDraft.words
       }
       this.currentView = 'word-entry'
     },
     openSession(session) {
-      this.currentSession = session
+      this.currentSession = { ...session }
+      
       if (session.finalWord) {
         // Completed session - show read-only detail view
         this.currentView = 'session-detail'
       } else {
-        // Incomplete session - allow editing
-        if (session.initialWords && Object.keys(session.initialWords).length > 0) {
-          // Has initial words, continue with association
+        // Check for draft data
+        const draftData = drafts.load(session.id)
+        if (draftData && draftData.words) {
+          this.currentSession.initialWords = draftData.words
+        }
+        
+        // Check if we have complete initial words to continue to association
+        const hasCompleteWords = this.currentSession.initialWords && 
+          Object.keys(this.currentSession.initialWords).length === 4 &&
+          Object.values(this.currentSession.initialWords).every(arr => arr && arr.length === 8)
+        
+        if (hasCompleteWords && !session.isDraft) {
+          // Has complete initial words, continue with association
           this.currentGroups = [
-            { name: 'Physical', words: session.initialWords.Physical || [] },
-            { name: 'Mental', words: session.initialWords.Mental || [] },
-            { name: 'Emotional', words: session.initialWords.Emotional || [] },
-            { name: 'Spiritual', words: session.initialWords.Spiritual || [] }
+            { name: 'Physical', words: this.currentSession.initialWords.Physical || [] },
+            { name: 'Mental', words: this.currentSession.initialWords.Mental || [] },
+            { name: 'Emotional', words: this.currentSession.initialWords.Emotional || [] },
+            { name: 'Spiritual', words: this.currentSession.initialWords.Spiritual || [] }
           ]
           this.currentView = 'association'
         } else {
-          // No initial words, start from word entry
+          // Incomplete or draft - go to word entry
           this.currentView = 'word-entry'
         }
       }
     },
+    handleWordEntryBack() {
+      // Save current session as draft before going back
+      if (this.currentSession && this.currentSession.isDraft) {
+        this.saveDraftSession()
+      }
+      this.currentView = 'home'
+    },
+    onDraftUpdate(draftData) {
+      if (!this.currentSession) return
+      
+      // Update session with draft data
+      this.currentSession.initialWords = draftData.words
+      this.currentSession.lastModified = new Date().toISOString()
+      this.currentSession.isDraft = true
+      
+      // Save to draft storage
+      drafts.save(this.currentSession.id, {
+        words: draftData.words,
+        currentStep: draftData.currentStep
+      })
+      
+      // Also save to sessions list
+      this.saveDraftSession()
+    },
+    saveDraftSession() {
+      const existingIndex = this.sessions.findIndex(s => s.id === this.currentSession.id)
+      if (existingIndex >= 0) {
+        this.sessions[existingIndex] = { ...this.currentSession }
+      } else {
+        this.sessions.push({ ...this.currentSession })
+      }
+      localStorage.setItem('alignment32-sessions', JSON.stringify(this.sessions))
+    },
     onWordsComplete(words) {
       this.currentSession.initialWords = words
+      this.currentSession.isDraft = false
+      this.currentSession.lastModified = new Date().toISOString()
       this.currentSession.wordHistory = [{
         step: 0,
         stage: 'Initial Words',
@@ -104,28 +162,52 @@ export default {
         { name: 'Emotional', words: words.Emotional },
         { name: 'Spiritual', words: words.Spiritual }
       ]
+      
+      // Clear draft since words are complete
+      drafts.clear(this.currentSession.id)
+      
+      // Save session
+      this.saveSession()
+      
       this.currentView = 'association'
     },
     onAssociationsComplete(result) {
       this.currentSession.finalWord = result.finalWord
       this.currentSession.wordHistory = result.wordHistory
       this.currentSession.associations = result.associations
+      this.currentSession.isDraft = false
+      this.currentSession.lastModified = new Date().toISOString()
+      
+      // Clear any remaining draft
+      drafts.clear(this.currentSession.id)
+      
       this.saveSession()
       this.currentView = 'home'
     },
     saveSession() {
       const existingIndex = this.sessions.findIndex(s => s.id === this.currentSession.id)
       if (existingIndex >= 0) {
-        this.sessions[existingIndex] = this.currentSession
+        this.sessions[existingIndex] = { ...this.currentSession }
       } else {
-        this.sessions.push(this.currentSession)
+        this.sessions.push({ ...this.currentSession })
       }
       localStorage.setItem('alignment32-sessions', JSON.stringify(this.sessions))
+    },
+    deleteSession(sessionId) {
+      this.sessions = this.sessions.filter(s => s.id !== sessionId)
+      localStorage.setItem('alignment32-sessions', JSON.stringify(this.sessions))
+      // Also clear any draft
+      drafts.clear(sessionId)
     },
     loadSessions() {
       const saved = localStorage.getItem('alignment32-sessions')
       if (saved) {
-        this.sessions = JSON.parse(saved)
+        try {
+          this.sessions = JSON.parse(saved)
+        } catch (e) {
+          console.warn('Failed to parse sessions:', e)
+          this.sessions = []
+        }
       }
     }
   }
