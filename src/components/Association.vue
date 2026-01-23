@@ -1,73 +1,73 @@
 <template>
   <div class="container mx-auto px-4 py-8">
     <div class="max-w-4xl mx-auto">
-      <div class="flex items-center mb-8">
+      <div class="flex items-center mb-6 sm:mb-8">
         <button 
           @click="$emit('back')"
-          class="mr-4 p-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors"
+          class="mr-3 sm:mr-4 p-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors text-sm sm:text-base"
         >
           ← Back
         </button>
-        <h1 class="text-3xl font-bold text-gray-800">Association Process</h1>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Association Process</h1>
       </div>
 
-      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-semibold text-gray-700">
+      <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
+          <h2 class="text-lg sm:text-xl font-bold text-gray-800">
             Step {{ currentStep }} of {{ totalSteps }}
           </h2>
-          <div class="text-sm text-gray-500">
+          <div class="text-xs sm:text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
             Groups: {{ currentGroups.length }} → {{ Math.ceil(currentGroups.length / 2) }}
           </div>
         </div>
         
-        <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+        <div class="w-full bg-gray-200 rounded-full h-3 shadow-inner mb-3 sm:mb-4">
           <div 
-            class="bg-blue-500 h-2 rounded-full transition-all duration-300"
+            class="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-500 shadow-sm"
             :style="{ width: `${(currentStep / totalSteps) * 100}%` }"
           ></div>
         </div>
 
-        <p class="text-gray-600">
+        <p class="text-sm sm:text-base text-gray-700">
           Create associations between word pairs from different groups. Each association will form a new merged group.
         </p>
       </div>
 
-      <div v-if="currentGroups.length > 1" class="space-y-6">
+      <div v-if="currentGroups.length > 1" class="space-y-4 sm:space-y-6">
         <div 
           v-for="(pair, index) in currentPairs" 
           :key="`pair-${currentStep}-${index}`"
-          class="bg-white rounded-lg shadow-md p-6"
+          class="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md border border-gray-200 p-4 sm:p-6"
         >
-          <h3 class="text-lg font-semibold text-gray-800 mb-4">
+          <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-4 sm:mb-5">
             Pair {{ index + 1 }}: {{ pair.group1.name }} + {{ pair.group2.name }}
           </h3>
           
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div class="text-center">
-              <h4 class="font-semibold text-gray-700 mb-2">{{ pair.group1.name }}</h4>
-              <div class="space-y-1">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 mb-5">
+            <div class="text-center bg-red-50 rounded-lg p-3 sm:p-4 border-2 border-red-200">
+              <h4 class="text-sm sm:text-base font-bold text-red-700 mb-3">{{ pair.group1.name }}</h4>
+              <div class="space-y-1.5">
                 <div 
                   v-for="(word, i) in pair.group1.words" 
                   :key="`g1-${i}`"
-                  class="px-3 py-1 bg-red-100 text-red-800 rounded text-sm"
+                  class="px-3 py-1.5 bg-white text-red-800 rounded-lg text-xs sm:text-sm font-medium border border-red-200 break-words"
                 >
                   {{ word }}
                 </div>
               </div>
             </div>
             
-            <div class="flex items-center justify-center">
-              <div class="text-2xl text-gray-400">+</div>
+            <div class="flex items-center justify-center py-2 md:py-0">
+              <div class="text-2xl sm:text-3xl font-bold text-gray-400">+</div>
             </div>
             
-            <div class="text-center">
-              <h4 class="font-semibold text-gray-700 mb-2">{{ pair.group2.name }}</h4>
-              <div class="space-y-1">
+            <div class="text-center bg-blue-50 rounded-lg p-3 sm:p-4 border-2 border-blue-200">
+              <h4 class="text-sm sm:text-base font-bold text-blue-700 mb-3">{{ pair.group2.name }}</h4>
+              <div class="space-y-1.5">
                 <div 
                   v-for="(word, i) in pair.group2.words" 
                   :key="`g2-${i}`"
-                  class="px-3 py-1 bg-blue-100 text-blue-800 rounded text-sm"
+                  class="px-3 py-1.5 bg-white text-blue-800 rounded-lg text-xs sm:text-sm font-medium border border-blue-200 break-words"
                 >
                   {{ word }}
                 </div>
@@ -75,27 +75,29 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div 
               v-for="i in Math.min(pair.group1.words.length, pair.group2.words.length)" 
               :key="`association-${i}`"
-              class="flex items-center space-x-2"
+              class="flex flex-col sm:flex-row sm:items-center gap-2.5 bg-gray-50 rounded-lg p-2.5 border border-gray-200"
             >
-              <span class="w-6 text-sm text-gray-500">{{ i }}.</span>
-              <div class="flex-1 flex items-center space-x-2">
-                <span class="px-2 py-1 bg-red-100 text-red-800 rounded text-sm">
-                  {{ pair.group1.words[i-1] }}
-                </span>
-                <span class="text-gray-400">+</span>
-                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">
-                  {{ pair.group2.words[i-1] }}
-                </span>
-                <span class="text-gray-400">=</span>
+              <span class="w-6 sm:w-7 text-xs sm:text-sm text-gray-600 flex-shrink-0 font-bold text-center bg-white rounded px-1 py-1">{{ i }}</span>
+              <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2 min-w-0">
+                <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                  <span class="px-2.5 py-1 bg-red-100 text-red-800 rounded-lg text-xs sm:text-sm font-medium truncate max-w-[80px] sm:max-w-[100px] lg:max-w-[120px] border border-red-200">
+                    {{ pair.group1.words[i-1] }}
+                  </span>
+                  <span class="text-gray-400 text-sm font-bold">+</span>
+                  <span class="px-2.5 py-1 bg-blue-100 text-blue-800 rounded-lg text-xs sm:text-sm font-medium truncate max-w-[80px] sm:max-w-[100px] lg:max-w-[120px] border border-blue-200">
+                    {{ pair.group2.words[i-1] }}
+                  </span>
+                  <span class="text-gray-400 text-sm font-bold">=</span>
+                </div>
                 <input
                   v-model="associations[`${index}-${i-1}`]"
                   type="text"
-                  :placeholder="`Association ${i}`"
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  :placeholder="`Your association ${i}...`"
+                  class="flex-1 min-w-0 max-w-[200px] sm:max-w-[240px] lg:max-w-[280px] px-3 py-2 text-sm sm:text-base border-2 border-gray-300 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all"
                   @input="updateProgress"
                 />
               </div>
@@ -103,35 +105,51 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <h3 class="text-lg font-semibold text-gray-800">Progress</h3>
-              <p class="text-sm text-gray-600">{{ filledAssociations }} of {{ requiredAssociations }} associations completed</p>
+        <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex-1">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-base sm:text-lg font-bold text-gray-800">Progress</h3>
+                <span class="text-base sm:text-lg font-bold text-gray-700">{{ Math.round((filledAssociations / requiredAssociations) * 100) }}%</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5 shadow-inner mb-1">
+                <div 
+                  class="bg-gradient-to-r from-blue-500 to-indigo-600 h-2.5 rounded-full transition-all duration-500 shadow-sm"
+                  :style="{ width: `${(filledAssociations / requiredAssociations) * 100}%` }"
+                ></div>
+              </div>
+              <p class="text-xs sm:text-sm text-gray-600">{{ filledAssociations }} of {{ requiredAssociations }} associations completed</p>
             </div>
             <button 
               @click="submitAssociations"
               :disabled="filledAssociations < requiredAssociations"
-              class="px-6 py-2 bg-green-500 text-white rounded-lg font-semibold transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-green-600"
+              :class="[
+                'px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-bold rounded-lg transition-all duration-200',
+                'disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed',
+                'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md hover:shadow-lg hover:scale-105',
+                'disabled:hover:scale-100 disabled:shadow-none'
+              ]"
             >
-              {{ currentGroups.length > 2 ? 'Continue' : 'Complete' }}
+              {{ currentGroups.length > 2 ? 'Continue →' : 'Complete ✓' }}
             </button>
           </div>
         </div>
       </div>
 
-      <div v-else class="bg-white rounded-lg shadow-md p-8 text-center">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">Final Result</h2>
-        <div class="text-6xl mb-6">🎯</div>
-        <h3 class="text-3xl font-semibold text-blue-600 mb-4">{{ finalWord }}</h3>
-        <p class="text-gray-600 mb-6">
-          Congratulations! You've completed the alignment process. This word represents the synthesis of all your 32 words.
+      <div v-else class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-xl shadow-lg border-2 border-blue-200 p-8 sm:p-12 text-center">
+        <div class="text-5xl sm:text-7xl mb-4 sm:mb-6 animate-bounce">🎯</div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-5">Final Result</h2>
+        <div class="bg-white rounded-xl p-6 sm:p-8 mb-5 sm:mb-6 shadow-md border-2 border-blue-300">
+          <h3 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2 break-words">{{ finalWord }}</h3>
+        </div>
+        <p class="text-sm sm:text-base text-gray-700 mb-6 sm:mb-8 px-4 max-w-2xl mx-auto">
+          🎉 Congratulations! You've completed the alignment process. This word represents the synthesis of all your 32 words.
         </p>
         <button 
           @click="completeProcess"
-          class="px-8 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+          class="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 text-sm sm:text-base bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-bold shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200"
         >
-          Return to Home
+          Return to Home →
         </button>
       </div>
     </div>
