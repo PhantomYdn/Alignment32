@@ -7,14 +7,14 @@ A comprehensive redesign plan to transform Alignment32 from a functional prototy
 ## Phase 1: Critical UX Fixes (Foundation)
 
 ### 1.1 Onboarding & Welcome Experience
-- [ ] Create `WelcomeModal.vue` component with 3-4 slide introduction
+- [x] Create `WelcomeModal.vue` component with 3-4 slide introduction
   - Slide 1: What is Alignment32? (purpose explanation)
   - Slide 2: The 4 categories explained (Physical, Mental, Emotional, Spiritual)
   - Slide 3: How the process works (32 → merge → 1 word)
   - Slide 4: What you'll discover (benefits/outcome)
-- [ ] Add "Don't show again" checkbox with localStorage persistence
-- [ ] Add "Learn More" link on HomeScreen for returning users
-- [ ] Write compelling, concise copy for each slide
+- [x] Add "Don't show again" checkbox with localStorage persistence
+- [x] Add "Learn More" link on HomeScreen for returning users
+- [x] Write compelling, concise copy for each slide
 
 ### 1.2 Stepper-Based Word Entry (Most Critical)
 - [x] Redesign `WordEntry.vue` with tabbed/stepper interface
@@ -46,10 +46,10 @@ A comprehensive redesign plan to transform Alignment32 from a functional prototy
 ## Phase 2: Association Screen Redesign
 
 ### 2.1 Simplify Information Architecture
-- [ ] Show ONE pair at a time (not all pairs simultaneously)
-- [ ] Clear step indicator: "Pair 1 of 2" with visual progress
-- [ ] Larger, more readable word cards (no truncation!)
-- [ ] Clearer instruction: "Create a word that represents both concepts"
+- [x] Show ONE pair at a time (not all pairs simultaneously)
+- [x] Clear step indicator: "Pair 1 of 2" with visual progress
+- [x] Larger, more readable word cards (no truncation!)
+- [x] Clearer instruction: "Create a word that represents both concepts"
 
 ### 2.2 Interactive Pairing (Future Enhancement)
 - [ ] Consider drag-and-drop word pairing (user chooses matches)
@@ -57,15 +57,15 @@ A comprehensive redesign plan to transform Alignment32 from a functional prototy
 - [ ] Add "Why these words?" optional explanation
 
 ### 2.3 Better Association Input
-- [ ] Larger input field for association word
-- [ ] Show the two source words prominently above input
-- [ ] Add "Stuck? Get a hint" feature (optional AI suggestion placeholder)
-- [ ] Visual "merge" animation when association is entered
+- [x] Larger input field for association word
+- [x] Show the two source words prominently above input
+- [ ] Add "Stuck? Get a hint" feature (optional AI suggestion placeholder) - DEFERRED
+- [x] Visual "merge" animation when association is entered (checkmark appears)
 
 ### 2.4 Progress & Completion
-- [ ] Animated progress visualization
-- [ ] Celebration micro-interaction when pair is complete
-- [ ] Summary view before proceeding to next round
+- [x] Animated progress visualization (overall + per-pair progress bars)
+- [x] Celebration micro-interaction when pair is complete (green checkmarks, dot indicators)
+- [x] Summary view before proceeding to next round (round summary modal)
 
 ---
 
@@ -173,11 +173,11 @@ A comprehensive redesign plan to transform Alignment32 from a functional prototy
 3. [x] 1.3 Auto-save functionality
 4. [x] 1.4 Word input improvements
 
-### Sprint 2: Onboarding & Associations (Week 2)
-5. [ ] 1.1 Welcome/onboarding modal
-6. [ ] 2.1 Simplify association screen
-7. [ ] 2.3 Better association input
-8. [ ] 2.4 Progress & completion improvements
+### Sprint 2: Onboarding & Associations (Week 2) - COMPLETED
+5. [x] 1.1 Welcome/onboarding modal
+6. [x] 2.1 Simplify association screen
+7. [x] 2.3 Better association input
+8. [x] 2.4 Progress & completion improvements
 
 ### Sprint 3: Visual Design (Week 3)
 9. [ ] 3.1 Color system
@@ -195,7 +195,7 @@ A comprehensive redesign plan to transform Alignment32 from a functional prototy
 ## Files to Create/Modify
 
 ### New Components
-- `src/components/WelcomeModal.vue`
+- `src/components/WelcomeModal.vue` - CREATED (Sprint 2)
 - `src/components/StepIndicator.vue` - CREATED
 - `src/components/CategoryStep.vue` - (integrated into WordEntry.vue)
 - `src/components/WordCard.vue`
@@ -203,12 +203,12 @@ A comprehensive redesign plan to transform Alignment32 from a functional prototy
 - `src/utils/storage.js` - CREATED (debounce + localStorage utilities)
 
 ### Modified Components
-- `src/App.vue` - Add welcome modal, toast system - UPDATED (draft handling, delete)
-- `src/components/HomeScreen.vue` - Draft indicators, session actions - UPDATED
+- `src/App.vue` - Add welcome modal, toast system - UPDATED (draft handling, delete, welcome modal)
+- `src/components/HomeScreen.vue` - Draft indicators, session actions - UPDATED (How it Works button)
 - `src/components/WordEntry.vue` - Complete redesign (stepper) - UPDATED
-- `src/components/Association.vue` - Simplify, one pair at a time
+- `src/components/Association.vue` - Simplify, one pair at a time - UPDATED (Sprint 2)
 - `src/components/SessionDetail.vue` - Export options, better layout
-- `src/style.css` - UPDATED (transition animations)
+- `src/style.css` - UPDATED (transition animations, scale transitions)
 
 ### Configuration
 - `tailwind.config.js` - Custom colors, fonts

@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* Step transition - slide left/right between steps */
 .step-slide-enter-active,
@@ -68,4 +66,27 @@
 
 .draft-saved-pulse {
   animation: draft-saved-pulse 1s ease-in-out;
+}
+
+/* Scale transition for checkmarks and icons */
+.scale-enter-active,
+.scale-leave-active {
+  transition: all 0.2s ease;
+}
+
+.scale-enter-from,
+.scale-leave-to {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+/* Celebration pulse animation */
+@keyframes celebration-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.celebration-pulse {
+  animation: celebration-pulse 0.5s ease-in-out;
 }

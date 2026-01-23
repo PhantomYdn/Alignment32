@@ -1,10 +1,15 @@
 <template>
   <div class="min-h-screen bg-gray-100">
+    <WelcomeModal 
+      :force-show="showWelcomeModal"
+      @close="showWelcomeModal = false"
+    />
     <HomeScreen 
       v-if="currentView === 'home'"
       @create-session="startNewSession"
       @open-session="openSession"
       @delete-session="deleteSession"
+      @show-welcome="showWelcomeModal = true"
       :sessions="sessions"
     />
     <WordEntry
@@ -35,6 +40,7 @@ import HomeScreen from './components/HomeScreen.vue'
 import WordEntry from './components/WordEntry.vue'
 import Association from './components/Association.vue'
 import SessionDetail from './components/SessionDetail.vue'
+import WelcomeModal from './components/WelcomeModal.vue'
 import { drafts } from './utils/storage.js'
 
 export default {
@@ -43,14 +49,16 @@ export default {
     HomeScreen,
     WordEntry,
     Association,
-    SessionDetail
+    SessionDetail,
+    WelcomeModal
   },
   data() {
     return {
       currentView: 'home',
       sessions: [],
       currentSession: null,
-      currentGroups: []
+      currentGroups: [],
+      showWelcomeModal: false
     }
   },
   mounted() {
