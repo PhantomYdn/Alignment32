@@ -89,3 +89,5 @@ Physical, Mental, Emotional, Spiritual
 - **Words not saving**: Verify all 32 filled, check trim() logic
 - **Association stuck**: Check currentPairs computed, group lengths
 - **View not changing**: Check currentView state in App.vue
+- **Styles not applying**: Tailwind v4 uses `@import "tailwindcss"` not `@tailwind` directives
+- **Visual issues**: Take real screenshots (not PDF) — PDF flattens fixed/absolute elements incorrectly
