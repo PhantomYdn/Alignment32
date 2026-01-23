@@ -1,37 +1,43 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
+  <div class="min-h-screen bg-gradient-to-br from-brand-50 via-white to-spiritual-50">
     <WelcomeModal 
       :force-show="showWelcomeModal"
       @close="showWelcomeModal = false"
     />
-    <HomeScreen 
-      v-if="currentView === 'home'"
-      @create-session="startNewSession"
-      @open-session="openSession"
-      @delete-session="deleteSession"
-      @show-welcome="showWelcomeModal = true"
-      :sessions="sessions"
-    />
-    <WordEntry
-      v-if="currentView === 'word-entry'"
-      :existing-words="currentSession ? currentSession.initialWords : {}"
-      :session-id="currentSession ? currentSession.id : null"
-      @words-complete="onWordsComplete"
-      @draft-update="onDraftUpdate"
-      @back="handleWordEntryBack"
-    />
-    <Association
-      v-if="currentView === 'association'"
-      :groups="currentGroups"
-      :initial-word-history="currentSession.wordHistory"
-      @associations-complete="onAssociationsComplete"
-      @back="currentView = 'word-entry'"
-    />
-    <SessionDetail
-      v-if="currentView === 'session-detail'"
-      :session="currentSession"
-      @back="currentView = 'home'"
-    />
+    <transition name="page" mode="out-in">
+      <HomeScreen 
+        v-if="currentView === 'home'"
+        key="home"
+        @create-session="startNewSession"
+        @open-session="openSession"
+        @delete-session="deleteSession"
+        @show-welcome="showWelcomeModal = true"
+        :sessions="sessions"
+      />
+      <WordEntry
+        v-else-if="currentView === 'word-entry'"
+        key="word-entry"
+        :existing-words="currentSession ? currentSession.initialWords : {}"
+        :session-id="currentSession ? currentSession.id : null"
+        @words-complete="onWordsComplete"
+        @draft-update="onDraftUpdate"
+        @back="handleWordEntryBack"
+      />
+      <Association
+        v-else-if="currentView === 'association'"
+        key="association"
+        :groups="currentGroups"
+        :initial-word-history="currentSession.wordHistory"
+        @associations-complete="onAssociationsComplete"
+        @back="currentView = 'word-entry'"
+      />
+      <SessionDetail
+        v-else-if="currentView === 'session-detail'"
+        key="session-detail"
+        :session="currentSession"
+        @back="currentView = 'home'"
+      />
+    </transition>
   </div>
 </template>
 

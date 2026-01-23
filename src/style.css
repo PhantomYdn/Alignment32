@@ -1,9 +1,108 @@
 @import "tailwindcss";
 
+/* ============================
+   CUSTOM THEME (Tailwind v4)
+   ============================ */
+
+@theme {
+  /* Primary brand colors - deep indigo/purple spectrum */
+  --color-brand-50: #f5f3ff;
+  --color-brand-100: #ede9fe;
+  --color-brand-200: #ddd6fe;
+  --color-brand-300: #c4b5fd;
+  --color-brand-400: #a78bfa;
+  --color-brand-500: #8b5cf6;
+  --color-brand-600: #7c3aed;
+  --color-brand-700: #6d28d9;
+  --color-brand-800: #5b21b6;
+  --color-brand-900: #4c1d95;
+  --color-brand-950: #2e1065;
+
+  /* Physical category - Amber */
+  --color-physical-50: #fffbeb;
+  --color-physical-100: #fef3c7;
+  --color-physical-200: #fde68a;
+  --color-physical-300: #fcd34d;
+  --color-physical-400: #fbbf24;
+  --color-physical-500: #f59e0b;
+  --color-physical-600: #d97706;
+  --color-physical-700: #b45309;
+
+  /* Mental category - Blue */
+  --color-mental-50: #eff6ff;
+  --color-mental-100: #dbeafe;
+  --color-mental-200: #bfdbfe;
+  --color-mental-300: #93c5fd;
+  --color-mental-400: #60a5fa;
+  --color-mental-500: #3b82f6;
+  --color-mental-600: #2563eb;
+  --color-mental-700: #1d4ed8;
+
+  /* Emotional category - Rose */
+  --color-emotional-50: #fff1f2;
+  --color-emotional-100: #ffe4e6;
+  --color-emotional-200: #fecdd3;
+  --color-emotional-300: #fda4af;
+  --color-emotional-400: #fb7185;
+  --color-emotional-500: #f43f5e;
+  --color-emotional-600: #e11d48;
+  --color-emotional-700: #be123c;
+
+  /* Spiritual category - Lavender (pastel) */
+  --color-spiritual-50: #faf8ff;
+  --color-spiritual-100: #f3effe;
+  --color-spiritual-200: #e9e2fc;
+  --color-spiritual-300: #d9cef7;
+  --color-spiritual-400: #c4b5f0;
+  --color-spiritual-500: #b4a7d6;
+  --color-spiritual-600: #9a8bc0;
+  --color-spiritual-700: #7f70a3;
+
+  /* Review category - Gold */
+  --color-review-50: #fffdf7;
+  --color-review-100: #fef9e7;
+  --color-review-200: #fdf0c3;
+  --color-review-300: #fce588;
+  --color-review-400: #fbd74d;
+  --color-review-500: #f5c518;
+  --color-review-600: #d9a706;
+  --color-review-700: #b38705;
+
+  /* Surface colors */
+  --color-surface-50: #fafafa;
+  --color-surface-100: #f5f5f5;
+  --color-surface-200: #e5e5e5;
+
+  /* Custom shadows */
+  --shadow-soft: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
+  --shadow-soft-lg: 0 10px 40px -10px rgba(0, 0, 0, 0.1), 0 2px 10px -2px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 0 20px -5px rgba(139, 92, 246, 0.3);
+  --shadow-glow-lg: 0 0 40px -5px rgba(139, 92, 246, 0.4);
+
+  /* Custom animations */
+  --animate-fade-in: fadeIn 0.3s ease-out;
+  --animate-slide-up: slideUp 0.3s ease-out;
+  --animate-scale-in: scaleIn 0.2s ease-out;
+  --animate-pulse-soft: pulseSoft 2s ease-in-out infinite;
+  --animate-celebration-glow: celebrationGlow 2s ease-in-out infinite;
+
+  /* Font family */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+@keyframes celebrationGlow {
+  0%, 100% { box-shadow: 0 0 5px rgba(139, 92, 246, 0.3); }
+  50% { box-shadow: 0 0 25px rgba(139, 92, 246, 0.5), 0 0 40px rgba(139, 92, 246, 0.3); }
+}
+
+/* ============================
+   TRANSITIONS & ANIMATIONS
+   ============================ */
+
 /* Step transition - slide left/right between steps */
 .step-slide-enter-active,
 .step-slide-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .step-slide-enter-from {
@@ -38,10 +137,26 @@
   opacity: 0;
 }
 
+/* Page transition - fade with subtle slide */
+.page-enter-active,
+.page-leave-active {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
 /* Expand/collapse transition for review sections */
 .expand-enter-active,
 .expand-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
 }
 
@@ -71,7 +186,7 @@
 /* Scale transition for checkmarks and icons */
 .scale-enter-active,
 .scale-leave-active {
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .scale-enter-from,
@@ -89,4 +204,136 @@
 
 .celebration-pulse {
   animation: celebration-pulse 0.5s ease-in-out;
+}
+
+/* ============================
+   FOCUS STYLES
+   ============================ */
+
+/* Custom focus ring for better accessibility */
+input:focus-visible,
+button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+/* Remove default focus outline when using focus-visible */
+input:focus:not(:focus-visible),
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ============================
+   SCROLLBAR STYLING
+   ============================ */
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c4b5fd;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a78bfa;
+}
+
+/* ============================
+   SELECTION STYLING
+   ============================ */
+
+::selection {
+  background-color: rgba(139, 92, 246, 0.2);
+  color: #4c1d95;
+}
+
+/* ============================
+   SMOOTH ANIMATIONS
+   ============================ */
+
+/* Smooth hover transitions for interactive elements */
+button,
+a,
+input {
+  transition-property: background-color, border-color, color, box-shadow, transform;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Prevent layout shift on hover */
+button:hover,
+a:hover {
+  will-change: transform;
+}
+
+/* ============================
+   TYPOGRAPHY ENHANCEMENTS
+   ============================ */
+
+/* Smooth font rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Prevent text selection on UI elements */
+button,
+.select-none {
+  user-select: none;
+}
+
+/* ============================
+   LOADING & SKELETON STATES
+   ============================ */
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ============================
+   BACKDROP BLUR FALLBACK
+   ============================ */
+
+@supports not (backdrop-filter: blur(12px)) {
+  .backdrop-blur-sm {
+    background-color: rgba(255, 255, 255, 0.95);
+  }
+  .backdrop-blur-md {
+    background-color: rgba(255, 255, 255, 0.97);
+  }
+}
+
+/* ============================
+   REDUCED MOTION
+   ============================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

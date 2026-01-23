@@ -1,22 +1,25 @@
 <template>
   <div class="min-h-screen flex flex-col">
     <!-- Sticky Header -->
-    <div class="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+    <div class="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <div class="container mx-auto px-4">
         <!-- Back button and title row -->
         <div class="flex items-center justify-between py-3">
           <button 
             @click="handleBack"
-            class="p-2 -ml-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-600"
+            class="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 class="text-lg sm:text-xl font-bold text-gray-800">Enter Your Words</h1>
+          <h1 class="text-xl sm:text-2xl font-bold text-gray-800 tracking-tight">Enter Your Words</h1>
           <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
             <transition name="fade">
-              <span v-if="showDraftSaved" class="text-green-600 font-medium draft-saved-pulse">
+              <span v-if="showDraftSaved" class="text-emerald-600 font-medium draft-saved-pulse flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
                 Saved
               </span>
             </transition>
@@ -40,33 +43,33 @@
             <!-- Category Header -->
             <div class="mb-6">
               <div class="flex items-center justify-between mb-3">
-                <h2 :class="['text-2xl sm:text-3xl font-bold', currentCategoryConfig.color]">
+                <h2 :class="['text-3xl sm:text-4xl font-extrabold tracking-tight', currentCategoryConfig.color]">
                   {{ currentCategoryName }}
                 </h2>
-                <div :class="['text-sm font-semibold px-3 py-1.5 rounded-full', currentCategoryConfig.badgeClass]">
+                <div :class="['text-sm font-bold px-3 py-1.5 rounded-full', currentCategoryConfig.badgeClass]">
                   {{ currentCategoryProgress }}/8
                 </div>
               </div>
               
               <!-- Progress bar -->
-              <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+              <div class="w-full bg-gray-100 rounded-full h-2 mb-4 overflow-hidden">
                 <div 
-                  :class="['h-2 rounded-full transition-all duration-300', currentCategoryConfig.progressClass]"
+                  :class="['h-2 rounded-full transition-all duration-500', currentCategoryConfig.progressClass]"
                   :style="{ width: `${(currentCategoryProgress / 8) * 100}%` }"
                 ></div>
               </div>
               
               <!-- Category description -->
-              <p class="text-gray-600 text-sm sm:text-base mb-2">
+              <p class="text-gray-600 text-base sm:text-lg mb-2 leading-relaxed">
                 {{ categoryDescriptions[currentCategoryName].description }}
               </p>
-              <p class="text-xs sm:text-sm text-gray-400 italic">
+              <p class="text-sm text-gray-400 italic">
                 Examples: {{ categoryDescriptions[currentCategoryName].examples }}
               </p>
             </div>
 
             <!-- Word Inputs -->
-            <div :class="['rounded-xl border-2 p-4 sm:p-6', currentCategoryConfig.bgClass, currentCategoryConfig.borderClass]">
+            <div :class="['rounded-2xl border-2 p-4 sm:p-6 shadow-soft', currentCategoryConfig.bgClass, currentCategoryConfig.borderClass]">
               <div class="space-y-3">
                 <div 
                   v-for="i in 8" 
@@ -74,7 +77,7 @@
                   class="space-y-1"
                 >
                   <div class="flex items-center gap-3">
-                    <span :class="['w-7 h-7 flex items-center justify-center text-sm font-bold rounded-full', 
+                    <span :class="['w-7 h-7 flex items-center justify-center text-sm font-bold rounded-full transition-all duration-200', 
                       words[currentCategoryName][i-1] && words[currentCategoryName][i-1].trim() 
                         ? currentCategoryConfig.badgeClass 
                         : 'bg-gray-200 text-gray-400'
@@ -89,14 +92,14 @@
                       :placeholder="getPlaceholder(i)"
                       :class="[
                         'flex-1 px-4 py-3 text-base border-2 rounded-xl transition-all duration-200',
-                        'focus:outline-none focus:ring-2 focus:ring-offset-1',
-                        'bg-white',
+                        'focus:outline-none focus:ring-2 focus:ring-offset-1 focus:shadow-md',
+                        'bg-white placeholder:text-gray-300 hover:shadow-sm',
                         currentCategoryConfig.focusClass,
                         getDuplicateIndex(currentCategoryName, i-1) !== -1 
-                          ? 'border-amber-400 bg-amber-50' 
+                          ? 'border-orange-400 bg-orange-50' 
                           : words[currentCategoryName][i-1] && words[currentCategoryName][i-1].trim() 
                             ? currentCategoryConfig.filledBorderClass 
-                            : 'border-gray-200'
+                            : 'border-gray-200 hover:border-gray-300'
                       ]"
                       @input="onWordInput"
                       @keydown.enter="focusNextInput(i)"
@@ -105,7 +108,7 @@
                   <!-- Duplicate warning -->
                   <div 
                     v-if="getDuplicateIndex(currentCategoryName, i-1) !== -1" 
-                    class="flex items-center gap-1.5 ml-10 text-xs text-amber-600"
+                    class="flex items-center gap-1.5 ml-10 text-xs text-orange-600"
                   >
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -117,12 +120,15 @@
             </div>
 
             <!-- Completion message -->
-            <transition name="fade">
+            <transition name="scale">
               <div 
                 v-if="currentCategoryProgress === 8" 
-                class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-center"
+                class="mt-4 p-4 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-center shadow-md animate-celebration-glow"
               >
-                <span class="text-green-700 font-medium">
+                <span class="text-emerald-700 font-bold flex items-center justify-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                   Category complete! Continue to the next step.
                 </span>
               </div>
@@ -132,8 +138,8 @@
           <!-- Review Step (4) -->
           <div v-else key="review">
             <div class="mb-6">
-              <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Review Your Words</h2>
-              <p class="text-gray-600">
+              <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-800 mb-3 tracking-tight">Review Your Words</h2>
+              <p class="text-gray-600 text-base sm:text-lg leading-relaxed">
                 Review all 32 words before continuing to the association phase.
               </p>
             </div>
@@ -143,21 +149,21 @@
               <div 
                 v-for="(category, categoryName) in categories" 
                 :key="categoryName"
-                :class="['rounded-xl border-2 overflow-hidden transition-all duration-200', category.borderClass, category.bgClass]"
+                :class="['rounded-2xl border-2 overflow-hidden transition-all duration-200 bg-white', category.borderClass]"
               >
                 <!-- Category header (clickable) -->
                 <button
                   @click="toggleCategory(categoryName)"
-                  class="w-full px-4 py-3 flex items-center justify-between hover:bg-white/50 transition-colors"
+                  class="w-full px-4 py-3.5 flex items-center justify-between hover:bg-gray-50 transition-colors"
                 >
                   <div class="flex items-center gap-3">
                     <span :class="['font-bold text-lg', category.color]">{{ categoryName }}</span>
-                    <span :class="['text-xs font-medium px-2 py-1 rounded-full', category.badgeClass]">
+                    <span :class="['text-xs font-bold px-2.5 py-1 rounded-full', category.badgeClass]">
                       {{ getCategoryProgress(categoryName) }}/8
                     </span>
                   </div>
                   <svg 
-                    :class="['w-5 h-5 transition-transform duration-200', expandedCategories[categoryName] ? 'rotate-180' : '']"
+                    :class="['w-5 h-5 transition-transform duration-200 text-gray-400', expandedCategories[categoryName] ? 'rotate-180' : '']"
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -168,15 +174,15 @@
 
                 <!-- Expanded content -->
                 <transition name="expand">
-                  <div v-if="expandedCategories[categoryName]" class="px-4 pb-4">
-                    <div class="flex flex-wrap gap-2">
+                  <div v-if="expandedCategories[categoryName]" :class="['px-4 pb-4', category.bgClass]">
+                    <div class="flex flex-wrap gap-2 pt-2">
                       <span 
                         v-for="(word, index) in words[categoryName]" 
                         :key="index"
                         :class="[
-                          'px-3 py-1.5 rounded-lg text-sm font-medium',
+                          'px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200',
                           word && word.trim() 
-                            ? 'bg-white border ' + category.borderClass + ' ' + category.color
+                            ? 'bg-white border shadow-sm ' + category.borderClass + ' ' + category.color
                             : 'bg-gray-100 text-gray-400 border border-gray-200'
                         ]"
                       >
@@ -186,7 +192,7 @@
                     <!-- Edit button -->
                     <button
                       @click="goToCategory(categoryName)"
-                      class="mt-3 text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                      :class="['mt-3 text-sm font-semibold hover:underline', category.color]"
                     >
                       Edit {{ categoryName }} words
                     </button>
@@ -196,14 +202,14 @@
             </div>
 
             <!-- Overall progress summary -->
-            <div class="mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
-              <div class="flex items-center justify-between mb-2">
+            <div class="mt-6 p-5 bg-white rounded-2xl border border-gray-200 shadow-soft">
+              <div class="flex items-center justify-between mb-3">
                 <span class="font-semibold text-gray-700">Total Progress</span>
                 <span class="font-bold text-gray-800">{{ filledWords }}/32</span>
               </div>
-              <div class="w-full bg-gray-200 rounded-full h-3">
+              <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
                 <div 
-                  class="bg-gradient-to-r from-indigo-500 to-purple-600 h-3 rounded-full transition-all duration-500"
+                  class="bg-gradient-to-r from-brand-500 to-spiritual-500 h-3 rounded-full transition-all duration-500"
                   :style="{ width: `${(filledWords / 32) * 100}%` }"
                 ></div>
               </div>
@@ -214,14 +220,14 @@
     </div>
 
     <!-- Sticky Footer Navigation -->
-    <div class="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 shadow-lg">
+    <div class="sticky bottom-0 bg-white/90 backdrop-blur-md border-t border-gray-100 shadow-lg">
       <div class="container mx-auto px-4 py-4">
         <div class="max-w-2xl mx-auto flex items-center justify-between gap-4">
           <!-- Previous button -->
           <button
             v-if="currentStep > 0"
             @click="prevStep"
-            class="px-4 sm:px-6 py-3 text-sm sm:text-base font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+            class="px-4 sm:px-6 py-3 text-sm sm:text-base font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200"
           >
             <span class="hidden sm:inline">Previous:</span>
             <span class="sm:hidden">&larr;</span>
@@ -236,7 +242,7 @@
             :class="[
               'flex-1 sm:flex-none px-6 sm:px-8 py-3 text-sm sm:text-base font-bold rounded-xl transition-all duration-200',
               canProceed 
-                ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-lg' 
+                ? 'bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white shadow-md hover:shadow-glow hover:-translate-y-0.5 active:scale-95' 
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             ]"
           >
@@ -286,40 +292,40 @@ export default {
       categoryOrder: ['Physical', 'Mental', 'Emotional', 'Spiritual'],
       categories: {
         Physical: {
-          color: 'text-red-700',
-          bgClass: 'bg-red-50',
-          borderClass: 'border-red-200',
-          badgeClass: 'bg-red-100 text-red-700',
-          progressClass: 'bg-gradient-to-r from-red-400 to-red-600',
-          focusClass: 'focus:ring-red-400 focus:border-red-400',
-          filledBorderClass: 'border-red-300'
+          color: 'text-physical-600',
+          bgClass: 'bg-physical-50',
+          borderClass: 'border-physical-200',
+          badgeClass: 'bg-physical-100 text-physical-700',
+          progressClass: 'bg-gradient-to-r from-physical-400 to-physical-500',
+          focusClass: 'focus:ring-physical-400 focus:border-physical-400',
+          filledBorderClass: 'border-physical-300'
         },
         Mental: {
-          color: 'text-blue-700',
-          bgClass: 'bg-blue-50',
-          borderClass: 'border-blue-200',
-          badgeClass: 'bg-blue-100 text-blue-700',
-          progressClass: 'bg-gradient-to-r from-blue-400 to-blue-600',
-          focusClass: 'focus:ring-blue-400 focus:border-blue-400',
-          filledBorderClass: 'border-blue-300'
+          color: 'text-mental-600',
+          bgClass: 'bg-mental-50',
+          borderClass: 'border-mental-200',
+          badgeClass: 'bg-mental-100 text-mental-700',
+          progressClass: 'bg-gradient-to-r from-mental-400 to-mental-500',
+          focusClass: 'focus:ring-mental-400 focus:border-mental-400',
+          filledBorderClass: 'border-mental-300'
         },
         Emotional: {
-          color: 'text-amber-700',
-          bgClass: 'bg-amber-50',
-          borderClass: 'border-amber-200',
-          badgeClass: 'bg-amber-100 text-amber-700',
-          progressClass: 'bg-gradient-to-r from-amber-400 to-amber-600',
-          focusClass: 'focus:ring-amber-400 focus:border-amber-400',
-          filledBorderClass: 'border-amber-300'
+          color: 'text-emotional-600',
+          bgClass: 'bg-emotional-50',
+          borderClass: 'border-emotional-200',
+          badgeClass: 'bg-emotional-100 text-emotional-700',
+          progressClass: 'bg-gradient-to-r from-emotional-400 to-emotional-500',
+          focusClass: 'focus:ring-emotional-400 focus:border-emotional-400',
+          filledBorderClass: 'border-emotional-300'
         },
         Spiritual: {
-          color: 'text-purple-700',
-          bgClass: 'bg-purple-50',
-          borderClass: 'border-purple-200',
-          badgeClass: 'bg-purple-100 text-purple-700',
-          progressClass: 'bg-gradient-to-r from-purple-400 to-purple-600',
-          focusClass: 'focus:ring-purple-400 focus:border-purple-400',
-          filledBorderClass: 'border-purple-300'
+          color: 'text-spiritual-600',
+          bgClass: 'bg-spiritual-50',
+          borderClass: 'border-spiritual-200',
+          badgeClass: 'bg-spiritual-100 text-spiritual-700',
+          progressClass: 'bg-gradient-to-r from-spiritual-400 to-spiritual-500',
+          focusClass: 'focus:ring-spiritual-400 focus:border-spiritual-400',
+          filledBorderClass: 'border-spiritual-300'
         }
       },
       categoryDescriptions: {

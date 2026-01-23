@@ -32,22 +32,22 @@
         <span 
           :class="[
             'text-xs mt-1.5 font-medium transition-colors duration-300 hidden sm:block',
-            index === currentStep ? 'text-gray-800' : 
-            index < currentStep ? 'text-green-600' : 'text-gray-400'
+            getLabelClasses(index)
           ]"
         >
           {{ step.name }}
         </span>
       </div>
       
-      <!-- Connector line (not after last step) -->
+      <!-- Connector line (not after last step) - vertically centered -->
       <div 
         v-if="index < steps.length - 1"
-        :class="[
-          'w-6 sm:w-10 md:w-16 h-1 mx-1 sm:mx-2 rounded-full transition-all duration-500',
-          index < currentStep ? 'bg-green-500' : 'bg-gray-200'
-        ]"
-      ></div>
+        class="flex items-center h-8 sm:h-10"
+      >
+        <div 
+          class="w-6 sm:w-10 md:w-16 h-0.5 mx-1 sm:mx-2 rounded-full bg-gray-200 transition-all duration-500"
+        ></div>
+      </div>
     </div>
   </div>
 </template>
@@ -66,17 +66,72 @@ export default {
       required: true
     }
   },
+  data() {
+    return {
+      stepColors: {
+        Physical: {
+          bg: 'bg-physical-500',
+          ring: 'ring-physical-200',
+          text: 'text-physical-600'
+        },
+        Mental: {
+          bg: 'bg-mental-500',
+          ring: 'ring-mental-200',
+          text: 'text-mental-600'
+        },
+        Emotional: {
+          bg: 'bg-emotional-500',
+          ring: 'ring-emotional-200',
+          text: 'text-emotional-600'
+        },
+        Spiritual: {
+          bg: 'bg-spiritual-500',
+          ring: 'ring-spiritual-200',
+          text: 'text-spiritual-600'
+        },
+        Review: {
+          bg: 'bg-review-500',
+          ring: 'ring-review-200',
+          text: 'text-review-600'
+        }
+      }
+    }
+  },
   methods: {
+    getStepColor(index) {
+      const stepName = this.steps[index]?.name
+      return this.stepColors[stepName] || {
+        bg: 'bg-gray-500',
+        ring: 'ring-gray-200',
+        text: 'text-gray-600'
+      }
+    },
     getStepClasses(index) {
+      const colors = this.getStepColor(index)
+      
       if (index < this.currentStep) {
-        // Completed step
-        return 'bg-green-500 text-white shadow-md'
+        // Completed step - use category color
+        return `${colors.bg} text-white shadow-md`
       } else if (index === this.currentStep) {
-        // Current step
-        return 'bg-indigo-600 text-white shadow-lg ring-4 ring-indigo-200'
+        // Current step - use category color with ring
+        return `${colors.bg} text-white shadow-lg ring-4 ${colors.ring}`
       } else {
-        // Future step
+        // Future step - gray
         return 'bg-gray-200 text-gray-400'
+      }
+    },
+    getLabelClasses(index) {
+      const colors = this.getStepColor(index)
+      
+      if (index < this.currentStep) {
+        // Completed - category color
+        return colors.text
+      } else if (index === this.currentStep) {
+        // Current - darker text
+        return 'text-gray-800'
+      } else {
+        // Future - gray
+        return 'text-gray-400'
       }
     }
   }
