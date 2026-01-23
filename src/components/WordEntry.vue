@@ -137,13 +137,7 @@
           </div>
 
           <!-- Review Step (4) -->
-          <div 
-            v-else 
-            key="review"
-            ref="reviewScreen"
-            @keydown.enter="nextStep"
-            tabindex="0"
-          >
+          <div v-else key="review">
             <div class="mb-6">
               <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-800 mb-3 tracking-tight">Review Your Words</h2>
               <p class="text-gray-600 text-base sm:text-lg leading-relaxed">
@@ -244,6 +238,7 @@
 
           <!-- Next/Continue button -->
           <button
+            ref="nextButton"
             @click="nextStep"
             :disabled="!canProceed"
             :class="[
@@ -480,9 +475,9 @@ export default {
     focusFirstInput() {
       // Wait for transition to complete (300ms animation + buffer)
       setTimeout(() => {
-        if (this.currentStep === 4 && this.$refs.reviewScreen) {
-          // Review screen - focus the container for Enter key support
-          this.$refs.reviewScreen.focus()
+        if (this.currentStep === 4 && this.$refs.nextButton) {
+          // Review screen - focus the Continue button
+          this.$refs.nextButton.focus()
         } else {
           // Category steps - focus first input
           const inputs = this.$el.querySelectorAll('input[type="text"]')
