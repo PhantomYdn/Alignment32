@@ -85,6 +85,21 @@ Physical, Mental, Emotional, Spiritual
 4. If final group has multiple words, split and repeat
 5. Process ends with single final word
 
+## UX Patterns
+
+### Keyboard Navigation
+Standard pattern for all screens:
+1. Auto-focus first input in `mounted()` using `$nextTick` + `$refs`
+2. Enter key on inputs advances to next input
+3. Enter on last input triggers primary action (same as button click)
+4. Enter on modals proceeds to next step
+5. Scroll to top and focus first input when navigating between sections
+
+### Focus Management
+- Focus actual interactive elements (buttons, inputs), not container divs
+- `tabindex` on containers creates visual issues (focus rings) and accessibility problems
+- Use `ref` on the actual button/input element, then call `.focus()` on it
+
 ## Debugging
 
 - **Session not loading**: Check localStorage key, JSON structure
@@ -93,3 +108,4 @@ Physical, Mental, Emotional, Spiritual
 - **View not changing**: Check currentView state in App.vue
 - **Styles not applying**: Tailwind v4 uses `@import "tailwindcss"` not `@tailwind` directives
 - **Visual issues**: Take real screenshots (not PDF) — PDF flattens fixed/absolute elements incorrectly
+- **Focus ring on wrong element**: If focus outline appears on container instead of button, check that `ref` and `tabindex` are on the actual interactive element, not a wrapper div
