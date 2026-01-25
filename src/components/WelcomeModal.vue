@@ -198,6 +198,10 @@
 </template>
 
 <script>
+import analytics from '../utils/analytics.js'
+import { setupSwipe } from '../utils/gestures.js'
+import { pulseShort } from '../utils/haptics.js'
+
 const STORAGE_KEY = 'alignment32-onboarding-complete'
 
 export default {
@@ -214,28 +218,44 @@ export default {
       isVisible: false,
       currentSlide: 0,
       dontShowAgain: false,
-      slides: [1, 2, 3, 4]
+      slides: [1, 2, 3, 4],
+      cleanupSwipe: null
     }
   },
   mounted() {
     if (this.forceShow) {
       this.isVisible = true
-      this.$nextTick(() => this.focusFirstElement())
+      this.$nextTick(() => {
+        this.focusFirstElement()
+        this.setupSwipeGesture()
+      })
     } else {
       this.checkShouldShow()
     }
+  },
+  beforeUnmount() {
+    this.cleanupSwipeGesture()
   },
   watch: {
     forceShow(newVal) {
       if (newVal) {
         this.isVisible = true
         this.currentSlide = 0
-        this.$nextTick(() => this.focusFirstElement())
+        analytics.onboardingView(1)
+        this.$nextTick(() => {
+          this.focusFirstElement()
+          this.setupSwipeGesture()
+        })
       }
     },
     isVisible(newVal) {
       if (newVal) {
-        this.$nextTick(() => this.focusFirstElement())
+        this.$nextTick(() => {
+          this.focusFirstElement()
+          this.setupSwipeGesture()
+        })
+      } else {
+        this.cleanupSwipeGesture()
       }
     }
   },
@@ -244,11 +264,39 @@ export default {
       const hasSeenOnboarding = localStorage.getItem(STORAGE_KEY)
       if (!hasSeenOnboarding) {
         this.isVisible = true
+        analytics.onboardingView(1)
+        this.$nextTick(() => this.setupSwipeGesture())
+      }
+    },
+    setupSwipeGesture() {
+      if (this.cleanupSwipe || !this.$refs.modalContent) return
+      
+      this.cleanupSwipe = setupSwipe(this.$refs.modalContent, {
+        onSwipeLeft: () => {
+          if (this.currentSlide < this.slides.length - 1) {
+            this.nextSlide()
+            pulseShort()
+          }
+        },
+        onSwipeRight: () => {
+          if (this.currentSlide > 0) {
+            this.previousSlide()
+            pulseShort()
+          }
+        },
+        threshold: 50
+      })
+    },
+    cleanupSwipeGesture() {
+      if (this.cleanupSwipe) {
+        this.cleanupSwipe()
+        this.cleanupSwipe = null
       }
     },
     nextSlide() {
       if (this.currentSlide < this.slides.length - 1) {
         this.currentSlide++
+        analytics.onboardingView(this.currentSlide + 1)
       }
     },
     previousSlide() {
@@ -257,6 +305,7 @@ export default {
       }
     },
     complete() {
+      analytics.onboardingComplete(this.dontShowAgain)
       if (this.dontShowAgain) {
         localStorage.setItem(STORAGE_KEY, 'true')
       }
@@ -266,6 +315,7 @@ export default {
     handleBackdropClick() {
       const hasSeenOnboarding = localStorage.getItem(STORAGE_KEY)
       if (hasSeenOnboarding || this.forceShow) {
+        analytics.onboardingSkip(this.currentSlide + 1)
         this.isVisible = false
         this.$emit('close')
       }
@@ -273,6 +323,7 @@ export default {
     handleEscape() {
       const hasSeenOnboarding = localStorage.getItem(STORAGE_KEY)
       if (hasSeenOnboarding || this.forceShow) {
+        analytics.onboardingSkip(this.currentSlide + 1)
         this.isVisible = false
         this.$emit('close')
       }

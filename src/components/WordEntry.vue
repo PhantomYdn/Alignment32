@@ -263,6 +263,9 @@
 <script>
 import StepIndicator from './StepIndicator.vue'
 import { debounce } from '../utils/storage.js'
+import analytics from '../utils/analytics.js'
+import { setupSwipe } from '../utils/gestures.js'
+import { pulseShort, pulseMedium } from '../utils/haptics.js'
 
 export default {
   name: 'WordEntry',
@@ -356,7 +359,8 @@ export default {
       },
       filledWords: 0,
       firstInput: null,
-      debouncedSaveDraft: null
+      debouncedSaveDraft: null,
+      cleanupSwipe: null
     }
   },
   computed: {
@@ -415,6 +419,13 @@ export default {
       }
     })
     this.focusFirstInput()
+    // Track initial category
+    analytics.categoryStart(this.currentCategoryName, this.currentStep)
+    // Setup swipe gestures
+    this.$nextTick(() => this.setupSwipeGesture())
+  },
+  beforeUnmount() {
+    this.cleanupSwipeGesture()
   },
   methods: {
     getCategoryProgress(categoryName) {
@@ -457,6 +468,7 @@ export default {
         words: this.words,
         currentStep: this.currentStep
       })
+      analytics.draftSaved(this.filledWords)
       this.showDraftSaved = true
       setTimeout(() => {
         this.showDraftSaved = false
@@ -491,13 +503,23 @@ export default {
       if (!this.canProceed) return
       
       if (this.currentStep < 4) {
+        // Track category completion before moving forward
+        analytics.categoryComplete(this.currentCategoryName)
+        
         this.transitionDirection = 'forward'
         this.currentStep++
+        
+        // Track new category start (unless going to review)
+        if (this.currentStep < 4) {
+          analytics.categoryStart(this.currentCategoryName, this.currentStep)
+        }
+        
         this.$nextTick(() => {
           window.scrollTo({ top: 0, behavior: 'smooth' })
           this.focusFirstInput()
         })
       } else {
+        analytics.wordEntryComplete()
         this.submitWords()
       }
     },
@@ -525,6 +547,7 @@ export default {
       if (this.currentStep > 0) {
         this.prevStep()
       } else {
+        analytics.navigationBack('word-entry')
         this.$emit('back')
       }
     },
@@ -535,6 +558,40 @@ export default {
           cleanWords[category] = this.words[category].map(word => word.trim()).filter(word => word !== '')
         })
         this.$emit('words-complete', cleanWords)
+      }
+    },
+    setupSwipeGesture() {
+      if (this.cleanupSwipe) return
+      
+      const mainContent = this.$el.querySelector('.flex-1.container')
+      if (!mainContent) return
+      
+      this.cleanupSwipe = setupSwipe(mainContent, {
+        onSwipeLeft: () => {
+          // Swipe left = go forward (only if can proceed)
+          if (this.canProceed && this.currentStep < 4) {
+            this.nextStep()
+            if (this.currentCategoryProgress === 8) {
+              pulseMedium() // Category complete feedback
+            } else {
+              pulseShort()
+            }
+          }
+        },
+        onSwipeRight: () => {
+          // Swipe right = go back (always allowed)
+          if (this.currentStep > 0) {
+            this.prevStep()
+            pulseShort()
+          }
+        },
+        threshold: 50
+      })
+    },
+    cleanupSwipeGesture() {
+      if (this.cleanupSwipe) {
+        this.cleanupSwipe()
+        this.cleanupSwipe = null
       }
     }
   }

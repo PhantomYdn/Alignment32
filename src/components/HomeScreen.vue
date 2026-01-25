@@ -21,7 +21,7 @@
             + Create New Session
           </button>
           <button 
-            @click="$emit('show-welcome')"
+            @click="handleHowItWorks"
             class="w-full sm:w-auto bg-white hover:bg-brand-50 text-brand-600 font-medium py-3 sm:py-3.5 px-6 sm:px-8 rounded-xl transition-all duration-200 text-sm sm:text-base border-2 border-brand-200 hover:border-brand-300"
           >
             How It Works
@@ -51,6 +51,7 @@
           <div 
             v-for="session in sortedSessions" 
             :key="session.id"
+            :data-session-id="session.id"
             :class="[
               'bg-white rounded-xl p-4 sm:p-5 transition-all duration-200 relative group cursor-pointer',
               'border-2 hover:shadow-soft',
@@ -217,12 +218,69 @@
         </div>
       </transition>
     </teleport>
+
+    <!-- Long-press action sheet -->
+    <BottomSheet
+      :is-visible="!!actionSheetSession"
+      :title="actionSheetTitle"
+      :subtitle="actionSheetSubtitle"
+      @close="closeActionSheet"
+    >
+      <div class="space-y-2">
+        <button
+          @click="handleRenameFromSheet"
+          class="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-gray-50 transition-colors text-left"
+        >
+          <div class="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-semibold text-gray-800">Rename Session</p>
+            <p class="text-sm text-gray-500">Change the session name</p>
+          </div>
+        </button>
+        
+        <button
+          @click="handleDeleteFromSheet"
+          class="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-red-50 transition-colors text-left"
+        >
+          <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-semibold text-red-600">Delete Session</p>
+            <p class="text-sm text-gray-500">Permanently remove this session</p>
+          </div>
+        </button>
+      </div>
+      
+      <template #actions>
+        <button
+          @click="closeActionSheet"
+          class="w-full py-3.5 text-center font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+        >
+          Cancel
+        </button>
+      </template>
+    </BottomSheet>
   </div>
 </template>
 
 <script>
+import analytics from '../utils/analytics.js'
+import BottomSheet from './BottomSheet.vue'
+import { setupLongPress } from '../utils/gestures.js'
+import { doubleTap, warning } from '../utils/haptics.js'
+
 export default {
   name: 'HomeScreen',
+  components: {
+    BottomSheet
+  },
   props: {
     sessions: {
       type: Array,
@@ -234,7 +292,9 @@ export default {
     return {
       sessionToDelete: null,
       editingSessionId: null,
-      editingName: ''
+      editingName: '',
+      actionSheetSession: null,
+      longPressCleanups: []
     }
   },
   computed: {
@@ -244,7 +304,25 @@ export default {
         const dateB = new Date(b.lastModified || b.createdAt)
         return dateB - dateA
       })
+    },
+    actionSheetTitle() {
+      if (!this.actionSheetSession) return ''
+      return this.actionSheetSession.name || `Session ${this.formatDate(this.actionSheetSession.createdAt)}`
+    },
+    actionSheetSubtitle() {
+      if (!this.actionSheetSession) return ''
+      return this.getStatusText(this.actionSheetSession)
     }
+  },
+  mounted() {
+    this.$nextTick(() => this.setupLongPressHandlers())
+  },
+  updated() {
+    // Re-setup long press handlers when sessions list changes
+    this.$nextTick(() => this.setupLongPressHandlers())
+  },
+  beforeUnmount() {
+    this.cleanupLongPressHandlers()
   },
   methods: {
     formatDate(dateStr) {
@@ -343,6 +421,54 @@ export default {
       return Object.values(session.initialWords)
         .flat()
         .filter(word => word && word.trim()).length
+    },
+    handleHowItWorks() {
+      analytics.howItWorksClick()
+      this.$emit('show-welcome')
+    },
+    setupLongPressHandlers() {
+      // Clean up existing handlers first
+      this.cleanupLongPressHandlers()
+      
+      // Setup long-press on each session card
+      const sessionCards = this.$el.querySelectorAll('[data-session-id]')
+      sessionCards.forEach(card => {
+        const sessionId = card.dataset.sessionId
+        const session = this.sessions.find(s => s.id === sessionId || s.id === parseInt(sessionId))
+        if (!session) return
+        
+        const cleanup = setupLongPress(card, () => {
+          this.openActionSheet(session)
+          doubleTap()
+        }, { delay: 500 })
+        
+        this.longPressCleanups.push(cleanup)
+      })
+    },
+    cleanupLongPressHandlers() {
+      this.longPressCleanups.forEach(cleanup => cleanup())
+      this.longPressCleanups = []
+    },
+    openActionSheet(session) {
+      this.actionSheetSession = session
+    },
+    closeActionSheet() {
+      this.actionSheetSession = null
+    },
+    handleRenameFromSheet() {
+      const session = this.actionSheetSession
+      this.closeActionSheet()
+      this.$nextTick(() => {
+        this.startEditingName(session)
+      })
+    },
+    handleDeleteFromSheet() {
+      const session = this.actionSheetSession
+      this.closeActionSheet()
+      warning()
+      this.$nextTick(() => {
+        this.confirmDelete(session)
+      })
     }
   }
 }

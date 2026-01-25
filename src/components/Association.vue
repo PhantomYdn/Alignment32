@@ -314,6 +314,9 @@
 </template>
 
 <script>
+import analytics from '../utils/analytics.js'
+import { pulseMedium, celebration as hapticCelebration } from '../utils/haptics.js'
+
 // Lazy load confetti only when needed
 let confetti = null
 
@@ -327,6 +330,10 @@ export default {
     initialWordHistory: {
       type: Array,
       default: () => []
+    },
+    sessionId: {
+      type: [String, Number],
+      default: null
     }
   },
   emits: ['associations-complete', 'back'],
@@ -451,6 +458,9 @@ export default {
   },
   methods: {
     async triggerCelebration() {
+      // Trigger haptic celebration feedback
+      hapticCelebration()
+      
       // Lazy load confetti library only when needed
       if (!confetti) {
         const module = await import('canvas-confetti')
@@ -495,6 +505,8 @@ export default {
       this.wordHistory = [...this.initialWordHistory]
       this.initialTotalWords = this.currentGroups.reduce((sum, g) => sum + g.words.length, 0)
       this.totalAssociationsCompleted = 0
+      // Track first round start
+      analytics.roundStart(this.currentRound, this.totalWordsRemaining)
     },
     displayGroupName(name) {
       if (!name) return ''
@@ -643,9 +655,17 @@ export default {
       this.groupsBeforeRound = this.currentGroups.length
       this.newGroupsForNextRound = newGroups
 
+      // Track round completion
+      analytics.roundComplete(this.currentRound, associationsThisRound)
+      
+      // Haptic feedback for round completion
+      pulseMedium()
+
       if (newGroups.length === 1 && newGroups[0].words.length === 1) {
         this.finalWord = newGroups[0].words[0]
         this.currentGroups = []
+        // Track final word reached
+        analytics.finalWordReached(this.currentRound, this.sessionId)
       } else if (newGroups.length === 1 && newGroups[0].words.length > 1) {
         this.showRoundSummary = true
       } else {
@@ -665,6 +685,10 @@ export default {
       this.currentPairIndex = 0
       this.currentWordIndex = 0
       this.pairAssociations = {}
+      
+      // Track new round start
+      analytics.roundStart(this.currentRound, this.totalWordsRemaining)
+      
       this.scrollToTopAndFocus()
     },
     createMergedGroupName(name1, name2) {

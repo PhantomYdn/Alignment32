@@ -195,6 +195,56 @@
   transform: scale(0.8);
 }
 
+/* Bottom sheet transition */
+.bottom-sheet-enter-active {
+  transition: opacity 0.3s ease;
+}
+
+.bottom-sheet-enter-active > div:last-child {
+  animation: slideUp 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.bottom-sheet-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.bottom-sheet-leave-active > div:last-child {
+  animation: slideDown 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.bottom-sheet-enter-from,
+.bottom-sheet-leave-to {
+  opacity: 0;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+/* Slide up animation class for direct use */
+.animate-slide-up {
+  animation: slideUp 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Safe area for iOS bottom padding */
+.h-safe-area-bottom {
+  height: env(safe-area-inset-bottom, 0px);
+}
+
 /* Celebration pulse animation */
 @keyframes celebration-pulse {
   0% { transform: scale(1); }
