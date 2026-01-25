@@ -29,8 +29,9 @@
         key="association"
         :groups="currentGroups"
         :initial-word-history="currentSession.wordHistory"
+        :session-id="currentSession ? currentSession.id : null"
         @associations-complete="onAssociationsComplete"
-        @back="currentView = 'home'"
+        @back="handleAssociationBack"
       />
       <SessionDetail
         v-else-if="currentView === 'session-detail'"
@@ -49,6 +50,7 @@ import Association from './components/Association.vue'
 import SessionDetail from './components/SessionDetail.vue'
 import WelcomeModal from './components/WelcomeModal.vue'
 import { drafts } from './utils/storage.js'
+import analytics from './utils/analytics.js'
 
 export default {
   name: 'App',
@@ -91,6 +93,7 @@ export default {
       if (existingDraft && existingDraft.words) {
         this.currentSession.initialWords = existingDraft.words
       }
+      analytics.sessionStart(sessionId)
       this.currentView = 'word-entry'
     },
     openSession(session) {
@@ -98,6 +101,7 @@ export default {
       
       if (session.finalWord) {
         // Completed session - show read-only detail view
+        analytics.viewSessionDetail(session.id)
         this.currentView = 'session-detail'
       } else {
         // Check for draft data
@@ -110,6 +114,10 @@ export default {
         const hasCompleteWords = this.currentSession.initialWords && 
           Object.keys(this.currentSession.initialWords).length === 4 &&
           Object.values(this.currentSession.initialWords).every(arr => arr && arr.length === 8)
+        
+        // Track session resume
+        const sessionStatus = session.isDraft ? 'draft' : 'in_progress'
+        analytics.sessionResume(session.id, sessionStatus)
         
         if (hasCompleteWords && !session.isDraft) {
           // Has complete initial words, continue with association
@@ -131,6 +139,10 @@ export default {
       if (this.currentSession && this.currentSession.isDraft) {
         this.saveDraftSession()
       }
+      this.currentView = 'home'
+    },
+    handleAssociationBack() {
+      analytics.navigationBack('association')
       this.currentView = 'home'
     },
     onDraftUpdate(draftData) {
@@ -198,6 +210,10 @@ export default {
       // Clear any remaining draft
       drafts.clear(this.currentSession.id)
       
+      // Track session completion
+      const totalRounds = result.associations ? result.associations.length : 0
+      analytics.sessionComplete(this.currentSession.id, totalRounds)
+      
       this.saveSession()
       this.currentView = 'home'
     },
@@ -211,6 +227,10 @@ export default {
       localStorage.setItem('alignment32-sessions', JSON.stringify(this.sessions))
     },
     deleteSession(sessionId) {
+      const session = this.sessions.find(s => s.id === sessionId)
+      const sessionStatus = session?.finalWord ? 'completed' : session?.isDraft ? 'draft' : 'in_progress'
+      analytics.sessionDelete(sessionStatus)
+      
       this.sessions = this.sessions.filter(s => s.id !== sessionId)
       localStorage.setItem('alignment32-sessions', JSON.stringify(this.sessions))
       // Also clear any draft
@@ -222,6 +242,7 @@ export default {
         session.name = newName
         session.lastModified = new Date().toISOString()
         localStorage.setItem('alignment32-sessions', JSON.stringify(this.sessions))
+        analytics.sessionRename()
       }
     },
     loadSessions() {

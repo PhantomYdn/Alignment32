@@ -6,7 +6,7 @@
         <div class="max-w-4xl mx-auto flex items-center justify-between py-3">
           <div class="flex items-center">
             <button 
-              @click="$emit('back')"
+              @click="handleBack"
               class="mr-3 sm:mr-4 min-w-[44px] min-h-[44px] p-2.5 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 transition-all duration-200 shadow-sm flex items-center justify-center"
               aria-label="Go back"
             >
@@ -128,6 +128,8 @@
 </template>
 
 <script>
+import analytics from '../utils/analytics.js'
+
 export default {
   name: 'SessionDetail',
   props: {
@@ -138,6 +140,10 @@ export default {
   },
   emits: ['back'],
   methods: {
+    handleBack() {
+      analytics.navigationBack('session-detail')
+      this.$emit('back')
+    },
     getGroupClasses(name) {
       const baseClasses = {
         'Physical': 'bg-physical-50 border border-physical-200',
