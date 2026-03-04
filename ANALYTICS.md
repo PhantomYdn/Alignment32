@@ -83,15 +83,106 @@ Or use [GA4 DebugView](https://support.google.com/analytics/answer/7201382):
 
 ---
 
-## Key Metrics & Reports
+## GA4 Configuration Guide
 
-### Funnel Analysis
+After setup, configure these items in GA4 to unlock meaningful reporting. Without this, event parameters are collected but invisible in reports.
 
-Create a funnel in GA4 Explore:
-1. `session_start` - Started
-2. `word_entry_complete` - Entered all words
-3. `round_start` (round 1) - Started associations
-4. `final_word_reached` - Completed
+### 1. Register Custom Definitions (Do This First)
+
+Go to **Admin > Custom definitions > Create custom dimensions/metrics**.
+
+**Custom Dimensions** (text/categorical):
+
+| Name | Event parameter | Scope |
+|------|----------------|-------|
+| Category Name | `category_name` | Event |
+| Session Status | `session_status` | Event |
+| From Screen | `from_screen` | Event |
+
+**Custom Metrics** (numeric):
+
+| Name | Event parameter | Unit |
+|------|----------------|------|
+| Duration Seconds | `duration_seconds` | Standard |
+| Total Rounds | `total_rounds` | Standard |
+| Time Spent Seconds | `time_spent_seconds` | Standard |
+| Total Time Seconds | `total_time_seconds` | Standard |
+| Words Remaining | `words_remaining` | Standard |
+| Associations Created | `associations_created` | Standard |
+| Round Number | `round_number` | Standard |
+| Slide Number | `slide_number` | Standard |
+| Word Count | `word_count` | Standard |
+| Session Duration Seconds | `session_duration_seconds` | Standard |
+
+GA4 allows up to 50 custom dimensions and 50 custom metrics per property.
+
+### 2. Mark Key Events (Conversions)
+
+Go to **Admin > Events**, find these events, and toggle them as **Key Events**:
+
+| Event | Why |
+|-------|-----|
+| `session_complete` | Primary conversion — user finished the entire journey |
+| `final_word_reached` | Core value moment — the moment of insight |
+| `word_entry_complete` | Major milestone — user committed all 32 words |
+
+This enables GA4 to attribute conversions to traffic sources and calculate conversion rates automatically.
+
+### 3. Build Explorations
+
+#### Main Journey Funnel
+
+Go to **Explore > Blank > Funnel exploration** and add these steps:
+
+1. `session_start` — "Started"
+2. `category_complete` — "First Category Done"
+3. `word_entry_complete` — "All Words Entered"
+4. `round_start` — "Began Associations"
+5. `final_word_reached` — "Reached Final Word"
+6. `session_complete` — "Completed Session"
+
+This reveals exactly where people drop off. The gap between steps 1 and 2 shows if people are intimidated by the first category. The gap between steps 3 and 4 reveals if the transition from word entry to associations is confusing.
+
+#### Onboarding Funnel
+
+Separate funnel exploration:
+
+1. `onboarding_view` (slide_number = 1) — "Saw Welcome"
+2. `onboarding_complete` — "Finished Onboarding"
+
+Combine with `onboarding_skip` + `slide_number` dimension to see which slide loses people.
+
+#### Category Comparison (Free Form)
+
+Go to **Explore > Free form**:
+
+- **Rows:** `category_name` dimension
+- **Values:** `time_spent_seconds` metric (average), Event count
+- **Filter:** Event name = `category_complete`
+
+This shows which category (Physical, Mental, Emotional, Spiritual) takes the longest and which has the lowest completion count — revealing which dimension of life is hardest for people to articulate.
+
+#### Session Depth Analysis (Free Form)
+
+- **Rows:** `total_rounds` dimension
+- **Values:** Event count, `session_duration_seconds` (average)
+- **Filter:** Event name = `final_word_reached`
+
+Shows the distribution of how many rounds it takes people to reach their final word, and how long different depths take.
+
+### 4. Audiences (Optional)
+
+Go to **Admin > Audiences > New audience**:
+
+| Audience | Condition | Purpose |
+|----------|-----------|---------|
+| Completers | `session_complete` event fired | Understand your engaged users |
+| Abandoners | `session_start` fired AND NOT `session_complete` within 7 days | Understand drop-off patterns |
+| Returners | `session_resume` event fired | Users who come back to finish |
+
+---
+
+## Key Metrics & Formulas
 
 ### Engagement Metrics
 
