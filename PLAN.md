@@ -1,6 +1,6 @@
 # Alignment32 - Implementation Plan
 
-A phased implementation plan for Alignment32, aligned with the [PRD](PRD.md). Sprints 1-4 covered UX redesign, mobile optimization, accessibility, and PWA support. Sprints 5-8 cover dark mode, sharing, analytics, testing, and launch prep.
+A phased implementation plan for Alignment32, aligned with the [PRD](PRD.md). Sprints 1-4 covered UX redesign, mobile optimization, accessibility, and PWA support. Sprints 5-8 cover dark mode, sharing, analytics, testing, and web launch prep. Sprints 9-10 cover Capacitor native mobile apps and app store submission.
 
 ---
 
@@ -305,9 +305,148 @@ A phased implementation plan for Alignment32, aligned with the [PRD](PRD.md). Sp
 
 ---
 
+## Phase 9: Capacitor Setup & Storage Abstraction - Sprint 9 (Weeks 9-10)
+
+> PRD: FR-017, FR-018, FR-024 | US-010
+
+### 9.1 Capacitor Project Initialization
+- [ ] Install `@capacitor/core` and `@capacitor/cli` as dev dependencies
+- [ ] Run `npx cap init` with app ID (e.g., `com.alignment32.app`) and app name
+- [ ] Configure `capacitor.config.ts` (webDir: `dist`, server settings)
+- [ ] Add `npx cap add android` and `npx cap add ios` to generate native projects
+- [ ] Add `npm run cap:sync`, `npm run cap:android`, `npm run cap:ios` scripts to package.json
+- [ ] Verify `npm run build && npx cap sync` pipeline works end-to-end
+- [ ] Add `android/` and `ios/` to `.gitignore` considerations (or commit — decide policy)
+
+### 9.2 Unified Storage Abstraction
+- [ ] Install `@capacitor/preferences` plugin
+- [ ] Create `src/utils/platform-storage.js` — unified async API wrapping localStorage (web) and Capacitor Preferences (native)
+- [ ] Implement `get(key)`, `set(key, value)`, `remove(key)`, `keys()` methods
+- [ ] Add platform detection: `Capacitor.isNativePlatform()` to select backend
+- [ ] Migrate `src/utils/storage.js` to use `platform-storage.js` internally
+- [ ] Migrate all direct `localStorage` calls in components to use the storage abstraction
+- [ ] Test data persistence survives app restart on both web and native
+- [ ] Verify existing session data format is fully compatible (JSON round-trip)
+
+### 9.3 Status Bar & Native Shell Polish
+- [ ] Install `@capacitor/status-bar` plugin
+- [ ] Configure status bar color to match app theme (`#7c3aed` light, dark variant)
+- [ ] Integrate status bar updates with dark mode toggle (if Phase 5 complete)
+- [ ] Set status bar style (light content on dark background, dark content on light)
+- [ ] Test status bar appearance on both iOS and Android
+
+### 9.4 Native Build Verification
+- [ ] Build and run on Android emulator — verify all existing features work
+- [ ] Build and run on iOS simulator — verify all existing features work
+- [ ] Verify PWA service worker is disabled in native builds (Capacitor handles caching)
+- [ ] Test offline behavior in native shell
+- [ ] Verify touch targets and layout on native (no WebView viewport issues)
+
+---
+
+## Phase 10: Native Features - Sprint 9 (Weeks 10-11)
+
+> PRD: FR-019, FR-020, FR-021, FR-022, FR-023, FR-025 | US-010, US-011, US-012
+
+### 10.1 Native Share Sheet
+- [ ] Install `@capacitor/share` plugin
+- [ ] Update share button in SessionDetail.vue to detect native platform
+- [ ] On native: invoke `Share.share()` with session URL and title text
+- [ ] On web: keep existing clipboard copy + Web Share API fallback
+- [ ] Test share sheet on iOS (UIActivityViewController) and Android (share intent)
+
+### 10.2 Native Haptic Feedback
+- [ ] Install `@capacitor/haptics` plugin
+- [ ] Create `src/utils/platform-haptics.js` — unified API wrapping Web Vibration (web) and Capacitor Haptics (native)
+- [ ] Replace existing `haptics.js` Web Vibration calls with platform-haptics abstraction
+- [ ] Use `ImpactStyle.Medium` for celebrations, `ImpactStyle.Light` for button feedback
+- [ ] Use `NotificationStyle.Success` for session completion
+- [ ] Test haptic patterns on physical iOS and Android devices
+
+### 10.3 Biometric App Lock
+- [ ] Install `@capacitor-community/biometric-auth` plugin
+- [ ] Create `src/components/SettingsView.vue` with biometric lock toggle
+- [ ] Add `'settings'` view state to App.vue routing
+- [ ] Add settings gear icon to HomeScreen header
+- [ ] Persist biometric preference to storage (`alignment32-settings` key)
+- [ ] On app launch (when enabled): prompt biometric before showing content
+- [ ] Handle biometric unavailable gracefully (skip prompt, show warning in settings)
+- [ ] Handle biometric failure (allow retry, offer "Cancel" to close app)
+- [ ] Test Face ID (iOS), Touch ID (iOS), fingerprint (Android), face unlock (Android)
+
+### 10.4 Push Notification Reminders
+- [ ] Install `@capacitor/push-notifications` plugin
+- [ ] Request notification permission on opt-in (not on first launch)
+- [ ] Add reminder frequency setting to SettingsView (weekly / monthly / off)
+- [ ] Register device with FCM (Android) / APNs (iOS) for push delivery
+- [ ] Implement local notification scheduling as alternative (no server needed for reminders)
+- [ ] Handle notification tap: open app to create-session flow
+- [ ] Persist notification preference to storage
+- [ ] Test notification delivery on both platforms
+
+### 10.5 App Icon Badge
+- [ ] Install `@capawesome/capacitor-badge` plugin
+- [ ] Update badge count whenever draft sessions change (create, resume, complete, delete)
+- [ ] Set badge to count of incomplete sessions
+- [ ] Clear badge when all sessions are completed or app is opened
+- [ ] Test badge display on iOS and Android home screens
+
+### 10.6 Deep Link Handling
+- [ ] Install `@capacitor/app` plugin (for app URL open events)
+- [ ] Configure Associated Domains (iOS) and App Links (Android) for share URLs
+- [ ] Handle incoming deep link URLs in App.vue — parse and display shared session
+- [ ] Test deep link flow: tap share URL on device → app opens to shared session view
+- [ ] Fallback: if app not installed, URL opens in browser (existing web behavior)
+
+---
+
+## Phase 11: App Store Submission & Native Polish - Sprint 10 (Weeks 12-13)
+
+> PRD: App store presence objective | US-010
+
+### 11.1 App Store Assets
+- [ ] Create app icon (1024x1024 for App Store, 512x512 for Play Store) from existing logo
+- [ ] Generate required icon sizes for both platforms (Capacitor assets tooling)
+- [ ] Create splash screen / launch screen with branding
+- [ ] Take screenshots on multiple device sizes (iPhone 6.7", iPad, Pixel 7, etc.)
+- [ ] Write app store description (short + full) and keywords
+- [ ] Create promotional graphics (feature graphic for Play Store)
+
+### 11.2 App Store Compliance
+- [ ] Write privacy policy (hosted URL required by both stores)
+- [ ] Complete Apple App Privacy nutrition labels (data not collected/linked)
+- [ ] Complete Google Play Data Safety section
+- [ ] Set up Apple Developer account and app ID (if not existing)
+- [ ] Set up Google Play Developer account and app listing (if not existing)
+- [ ] Configure code signing: iOS provisioning profiles and certificates
+- [ ] Configure code signing: Android keystore for release builds
+
+### 11.3 Beta Testing
+- [ ] Deploy iOS build to TestFlight for internal testing
+- [ ] Deploy Android build to Google Play internal testing track
+- [ ] Test full user flow end-to-end on physical devices (both platforms)
+- [ ] Verify all native features (share, haptics, biometrics, push, badge, status bar)
+- [ ] Verify deep links work from external sources (browser, messaging apps)
+- [ ] Fix any platform-specific bugs discovered during beta
+
+### 11.4 Store Submission
+- [ ] Submit iOS app for App Store Review
+- [ ] Submit Android app to Google Play production track
+- [ ] Monitor review feedback and address any rejections
+- [ ] Verify listings are live and searchable
+- [ ] Set up crash reporting / monitoring for native apps (e.g., Firebase Crashlytics)
+
+### 11.5 Post-Launch
+- [ ] Monitor app store install counts against >500 target (3-month window)
+- [ ] Monitor crash reports and address critical issues
+- [ ] Track native feature adoption (biometric, push opt-in) against PRD targets
+- [ ] Plan first native update based on user feedback and store reviews
+
+---
+
 ## Future
 
-> Nice-to-have items outside current scope. Revisit after Sprint 8.
+> Nice-to-have items outside current scope. Revisit after Sprint 10.
 
 ### UX Enhancements
 - [ ] Drag-and-drop word pairing (user chooses which words to associate)

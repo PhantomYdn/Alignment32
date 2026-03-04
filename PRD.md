@@ -4,7 +4,9 @@
 
 Alignment32 is a client-side Vue 3 web application that guides users through a structured word alignment process to discover their personal core values. Users enter 32 meaningful words across 4 life categories (Physical, Mental, Emotional, Spiritual), then progressively merge them through guided word association until a single word remains -- representing their core alignment.
 
-The app solves the problem of abstract self-reflection by providing a concrete, step-by-step framework that transforms scattered thoughts into a focused personal insight. All data stays local to the user's browser, ensuring complete privacy.
+The app solves the problem of abstract self-reflection by providing a concrete, step-by-step framework that transforms scattered thoughts into a focused personal insight. All data stays local to the user's device, ensuring complete privacy.
+
+The app is distributed as a PWA for web browsers and as native mobile applications for iOS and Android via Capacitor, with listings on the Apple App Store and Google Play Store.
 
 ## Objectives
 
@@ -15,6 +17,8 @@ The app solves the problem of abstract self-reflection by providing a concrete, 
 | Mobile usability | Equal experience quality on mobile and desktop | Lighthouse mobile score >90 |
 | Offline capability | Full functionality without internet connection | PWA audit pass, all features work offline |
 | Load performance | Sub-second initial load on 4G connection | Lighthouse performance score >90 |
+| App store presence | Published on Google Play and Apple App Store | Store listing live and approved |
+| Native install rate | >500 installs within 3 months of store launch | App store analytics dashboards |
 
 ## Target Audience
 
@@ -63,6 +67,14 @@ The app solves the problem of abstract self-reflection by providing a concrete, 
 | Product analytics | P2 | Completion rates, time spent, feature usage tracking | Sprint 6 |
 | Export: clipboard copy | P2 | Copy final word or journey summary to clipboard | Sprint 5 |
 | Export: image card | P2 | Generate shareable image of final word / journey | Sprint 6 |
+| Capacitor native wrapper | P1 | Package web app as native iOS and Android apps via Capacitor | Sprint 9 |
+| Native share sheet | P1 | Use OS-level share dialog for session sharing (Capacitor Share plugin) | Sprint 9 |
+| Push notifications | P2 | Check-in reminders and update notifications (Capacitor Push Notifications) | Sprint 9 |
+| Native haptic feedback | P2 | Replace Web Vibration API with Capacitor Haptics for richer tactile response | Sprint 9 |
+| Biometric app lock | P2 | Optional fingerprint/Face ID unlock to protect private session data | Sprint 9 |
+| App icon badge | P2 | Show badge count on app icon for draft sessions pending completion | Sprint 9 |
+| Native status bar styling | P2 | Match status bar color/style to app theme and dark mode (Capacitor Status Bar) | Sprint 9 |
+| App store submission | P1 | Publish to Google Play Store and Apple App Store with listings | Sprint 10 |
 
 ### Future Considerations (Backlog)
 
@@ -155,6 +167,30 @@ The app solves the problem of abstract self-reflection by providing a concrete, 
   - [ ] Privacy-respecting: no PII collected, opt-in or anonymized
   - [ ] Analytics data exportable for analysis
 
+### Native Mobile App (Planned)
+
+**US-010**: As a mobile user, I want to install Alignment32 from the App Store or Google Play, so that I get a native app experience with reliable storage and OS integration.
+- Acceptance Criteria:
+  - [ ] App installable from Apple App Store (iOS 15+)
+  - [ ] App installable from Google Play Store (Android 8+)
+  - [ ] All web features work identically in native shell
+  - [ ] Session data persists reliably via Capacitor Preferences API
+  - [ ] Status bar matches app theme (light/dark)
+
+**US-011**: As a privacy-conscious user, I want to lock the app with biometrics, so that my personal word data is protected if someone else accesses my phone.
+- Acceptance Criteria:
+  - [ ] Optional biometric lock toggle in app settings
+  - [ ] Supports Face ID, Touch ID (iOS) and fingerprint/face unlock (Android)
+  - [ ] App prompts for biometric on launch when enabled
+  - [ ] Graceful fallback if biometrics unavailable (skip lock, not block access)
+
+**US-012**: As a returning user, I want to receive occasional reminders to do a check-in session, so that I maintain my alignment practice over time.
+- Acceptance Criteria:
+  - [ ] Opt-in push notification for periodic check-in reminders
+  - [ ] User can configure frequency (weekly, monthly) or disable
+  - [ ] Notification taps open the app to the create-session flow
+  - [ ] No notifications sent without explicit user permission
+
 ## Functional Requirements
 
 ### Core (Implemented)
@@ -185,6 +221,18 @@ The app solves the problem of abstract self-reflection by providing a concrete, 
 - **FR-015**: The app shall track anonymized usage events (session start, phase transitions, completion, abandonment) in localStorage.
 - **FR-016**: The app shall provide category-level analysis showing which categories contribute most to later association rounds.
 
+### Native Mobile App (Planned)
+
+- **FR-017**: The app shall be packaged as native iOS and Android applications using Capacitor, wrapping the existing Vue 3 web app in a native WebView shell.
+- **FR-018**: The app shall abstract data persistence behind a unified storage API that uses Capacitor Preferences API on native platforms and localStorage on web, with transparent read/write for all existing session data.
+- **FR-019**: The app shall integrate the Capacitor Share plugin to invoke the native OS share sheet when sharing session URLs, falling back to clipboard copy on web.
+- **FR-020**: The app shall support opt-in push notifications via Capacitor Push Notifications plugin, with configurable reminder frequency (weekly, monthly, off) persisted in app settings.
+- **FR-021**: The app shall replace the Web Vibration API with Capacitor Haptics plugin on native platforms for richer tactile feedback during celebrations and interactions.
+- **FR-022**: The app shall provide an optional biometric lock via Capacitor Biometrics plugin, prompting for Face ID / Touch ID / fingerprint on app launch when enabled.
+- **FR-023**: The app shall display a badge count on the native app icon reflecting the number of incomplete draft sessions, using the Capacitor Badge plugin.
+- **FR-024**: The app shall control the native status bar appearance via the Capacitor Status Bar plugin, matching the bar color and style to the active theme (light/dark).
+- **FR-025**: The app shall handle deep links for shared session URLs, opening the app directly to the shared session view when a share URL is tapped on a device with the native app installed.
+
 ## Non-functional Requirements
 
 ### Performance
@@ -193,11 +241,19 @@ The app solves the problem of abstract self-reflection by providing a concrete, 
 - Bundle size under 200KB gzipped (excluding PWA cache assets)
 - All interactions respond within 100ms (input, navigation, transitions)
 
+### Storage
+- Web: browser localStorage (current behavior, unchanged)
+- Native (iOS/Android): Capacitor Preferences API for reliable persistent storage
+- Unified storage abstraction layer so all app code uses one API regardless of platform
+- Data format identical across platforms (JSON session objects)
+
 ### Security & Privacy
-- Zero data transmission to external servers (fully client-side)
+- Zero data transmission to external servers (fully client-side) except opt-in push notification registration
 - No cookies, no tracking pixels, no third-party scripts (unless analytics is opt-in)
-- All data stored in browser localStorage only
+- All data stored locally: browser localStorage (web) or Capacitor Preferences (native)
 - Shared URLs contain only the session data the user explicitly chooses to share
+- Optional biometric lock for native apps (Face ID, Touch ID, fingerprint)
+- App store privacy policy required for store submission
 
 ### Accessibility
 - WCAG AA compliance across all components
@@ -215,10 +271,19 @@ The app solves the problem of abstract self-reflection by providing a concrete, 
 - Mobile Safari (iOS 15+)
 - Chrome for Android (last 2 versions)
 
+### Native Platform Compatibility
+- iOS 15+ (Capacitor minimum: iOS 14, targeting 15+ for broader API support)
+- Android 8.0+ (API level 26+, Capacitor minimum)
+- Xcode 15+ required for iOS builds
+- Android Studio with SDK 34+ required for Android builds
+- App Store compliance: privacy nutrition labels, app review guidelines
+- Google Play compliance: target API level requirements, privacy policy
+
 ### Scalability
 - localStorage limit (~5MB) supports approximately 50-100 full sessions
+- Capacitor Preferences has no practical size limit on native (device storage bound)
 - URL-encoded sessions must stay under 2000 characters for broad compatibility
-- No backend infrastructure required for any current or planned feature
+- No backend infrastructure required except push notification delivery service (e.g., Firebase Cloud Messaging)
 
 ## Success Metrics
 
@@ -231,6 +296,9 @@ The app solves the problem of abstract self-reflection by providing a concrete, 
 | Load time (4G) | <1 second first contentful paint | Lighthouse or WebPageTest |
 | Share URL adoption | >10% of completed sessions generate a share URL | In-app event tracking |
 | Dark mode usage | >25% of users toggle or use dark mode | Theme preference in localStorage |
+| App store installs | >500 combined installs within 3 months of launch | App Store Connect + Google Play Console analytics |
+| Native feature adoption | >40% of native users enable biometric lock | In-app settings preference tracking |
+| Push notification opt-in | >30% of native users enable reminders | Push notification permission grant rate |
 
 ## Timeline
 
@@ -240,6 +308,8 @@ The app solves the problem of abstract self-reflection by providing a concrete, 
 | Sprint 6: Analytics + Export | Weeks 3-4 | Sprint 5 (share URL view reuse) | FR-014 through FR-016. User insights dashboard and product analytics. Image export. |
 | Sprint 7: Polish + Testing | Weeks 5-6 | Sprint 6 | Vitest setup, component tests for critical paths, bug fixes, performance optimization. |
 | Sprint 8: Launch Prep | Weeks 7-8 | Sprint 7 | Final QA, Lighthouse audits, documentation updates, production deployment. |
+| Sprint 9: Capacitor Integration & Native Features | Weeks 9-11 | Sprint 8 (web feature-complete) | FR-017 through FR-025. Capacitor setup, storage abstraction, native share, haptics, biometrics, push notifications, status bar, app badge, deep links. |
+| Sprint 10: App Store Submission & Native Polish | Weeks 12-13 | Sprint 9 | App store listings, screenshots, privacy policies, TestFlight/internal testing, store review submission, post-launch monitoring. |
 
 ---
 
@@ -249,8 +319,21 @@ The app solves the problem of abstract self-reflection by providing a concrete, 
 - **Framework**: Vue 3 (Options API)
 - **Styling**: Tailwind CSS v4 with custom theme (tailwind.config.js)
 - **Build**: Vite with vite-plugin-pwa
+- **Native**: Capacitor 6+ (iOS + Android)
 - **Font**: Inter (Google Fonts)
-- **Storage**: Browser localStorage
+- **Storage**: Browser localStorage (web), Capacitor Preferences (native)
+
+### Capacitor Plugins
+| Plugin | Purpose |
+|--------|---------|
+| @capacitor/preferences | Persistent key-value storage on native |
+| @capacitor/share | Native OS share sheet |
+| @capacitor/push-notifications | Check-in reminder notifications |
+| @capacitor/haptics | Native haptic feedback |
+| @capacitor/status-bar | Status bar color/style control |
+| @capacitor/app | Deep link and app state handling |
+| @capacitor-community/biometric-auth | Fingerprint / Face ID app lock |
+| @capawesome/capacitor-badge | App icon badge count |
 
 ### View Routing (App.vue state machine)
 - `'home'` -> HomeScreen
