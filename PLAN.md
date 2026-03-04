@@ -1,10 +1,18 @@
-# Alignment32 UX/UI Improvement Plan
+# Alignment32 - Implementation Plan
 
-A comprehensive redesign plan to transform Alignment32 from a functional prototype into an engaging, intuitive application for both desktop and mobile users.
+A phased implementation plan for Alignment32, aligned with the [PRD](PRD.md). Sprints 1-4 covered UX redesign, mobile optimization, accessibility, and PWA support. Sprints 5-8 cover dark mode, sharing, analytics, testing, and launch prep.
 
 ---
 
-## Phase 1: Critical UX Fixes (Foundation)
+## Incoming
+
+> Unscheduled items. Add new work here; next plan run will triage.
+
+- [ ] Update AGENTS.md to document BottomSheet.vue, analytics.js, gestures.js, haptics.js, storage.js
+
+---
+
+## Phase 1: Critical UX Fixes - COMPLETED (Sprint 1)
 
 ### 1.1 Onboarding & Welcome Experience
 - [x] Create `WelcomeModal.vue` component with 3-4 slide introduction
@@ -16,7 +24,7 @@ A comprehensive redesign plan to transform Alignment32 from a functional prototy
 - [x] Add "Learn More" link on HomeScreen for returning users
 - [x] Write compelling, concise copy for each slide
 
-### 1.2 Stepper-Based Word Entry (Most Critical)
+### 1.2 Stepper-Based Word Entry
 - [x] Redesign `WordEntry.vue` with tabbed/stepper interface
   - [x] Create step indicator component (dots/progress bar)
   - [x] Show ONE category at a time (not all 32 inputs)
@@ -43,7 +51,7 @@ A comprehensive redesign plan to transform Alignment32 from a functional prototy
 
 ---
 
-## Phase 2: Association Screen Redesign
+## Phase 2: Association Screen Redesign - COMPLETED (Sprint 2)
 
 ### 2.1 Simplify Information Architecture
 - [x] Show ONE pair at a time (not all pairs simultaneously)
@@ -69,7 +77,7 @@ A comprehensive redesign plan to transform Alignment32 from a functional prototy
 
 ---
 
-## Phase 3: Visual Design Overhaul
+## Phase 3: Visual Design Overhaul - COMPLETED (Sprint 3)
 
 ### 3.1 Color System & Theme
 - [x] Define custom color palette (calming, spiritual aesthetic)
@@ -103,19 +111,19 @@ A comprehensive redesign plan to transform Alignment32 from a functional prototy
 
 ---
 
-## Phase 4: Mobile-First Optimization - COMPLETED (Sprint 4)
+## Phase 4: Mobile, Sessions, Accessibility & PWA - COMPLETED (Sprint 4)
 
 ### 4.1 Layout Improvements
 - [x] Collapsible sections for word entry review
-- [ ] ~~Bottom sheet patterns for mobile inputs~~ - DEFERRED (see Future Considerations)
+- [ ] ~~Bottom sheet patterns for mobile inputs~~ - DEFERRED (see Future)
 - [x] Larger touch targets (min 44x44px)
 - [x] Proper spacing for thumb reach zones
 
 ### 4.2 Navigation
 - [x] Sticky header with context (current step) - Added to Association & SessionDetail
 - [x] Sticky bottom CTA button - WordEntry + Association mobile footer
-- [ ] ~~Swipe gestures between steps~~ - DEFERRED (see Future Considerations)
-- [ ] ~~Pull-to-refresh for session list~~ - DEFERRED (see Future Considerations)
+- [ ] ~~Swipe gestures between steps~~ - DEFERRED (see Future)
+- [ ] ~~Pull-to-refresh for session list~~ - DEFERRED (see Future)
 
 ### 4.3 Performance
 - [x] Lazy load components (confetti library - dynamic import)
@@ -123,188 +131,201 @@ A comprehensive redesign plan to transform Alignment32 from a functional prototy
 - [ ] ~~Optimize re-renders~~ - NOT NEEDED (Vue handles this well)
 - [ ] ~~Reduce layout shifts~~ - NOT NEEDED (no significant CLS issues)
 
----
-
-## Phase 5: Session Management Enhancement - COMPLETED (Sprint 4)
-
-### 5.1 Session Identity
+### 4.4 Session Identity
 - [x] Allow naming sessions (inline editable, with default date-based name)
 - [ ] ~~Add session icon/color picker~~ - DEFERRED (low value)
 - [x] Show preview of initial words on session card
 
-### 5.2 Session Actions
+### 4.5 Session Actions
 - [x] Delete session with confirmation
-- [ ] ~~Duplicate session (start fresh with same words)~~ - DEFERRED (see Future Considerations)
-- [ ] ~~Edit completed session (restart from associations)~~ - DEFERRED (see Future Considerations)
+- [ ] ~~Duplicate session (start fresh with same words)~~ - DEFERRED (see Future)
+- [ ] ~~Edit completed session (restart from associations)~~ - DEFERRED (see Future)
 
-### 5.3 Export & Sharing
-- [ ] Export session as image (final word card)
-- [ ] Export full journey as PDF
-- [ ] Share link (requires backend, future)
-- [ ] Copy final word to clipboard
-
----
-
-## Phase 6: Accessibility & Polish - COMPLETED (Sprint 4)
-
-### 6.1 Accessibility
+### 4.6 Accessibility
 - [x] Add proper ARIA labels to all interactive elements
 - [x] Keyboard navigation support (focus trapping in modals, tab navigation)
 - [x] Screen reader announcements for progress (aria-live regions)
 - [x] Color contrast compliance (WCAG AA) - uses Tailwind standard colors
 - [x] Focus indicators (focus:ring styles)
 
-### 6.2 Error Handling
+### 4.7 Error Handling
 - [x] Graceful localStorage errors (storage.js utilities)
 - [x] Form validation messages (duplicate word warnings)
 - [x] Empty state improvements (HomeScreen empty state)
 
-### 6.3 Final Polish
-- [ ] Loading states - NOT NEEDED (instant local storage)
-- [ ] Error boundaries - DEFERRED
-- [ ] 404/error pages (if routing added) - NOT APPLICABLE
+### 4.8 PWA & Branding
 - [x] PWA support (installable app) - vite-plugin-pwa configured
-- [x] Favicon and meta tags - Updated with mandala logo
+- [x] Create SVG logo (mandala design with 4-fold symmetry, category colors)
+- [x] Generate PWA icons (192x192, 512x512, apple-touch-icon)
+- [x] Update favicon and index.html with new logo
+- [x] Mobile gesture support (gestures.js - swipe, long-press detection)
+- [x] Haptic feedback (haptics.js - Vibration API wrapper)
+- [x] Google Analytics integration (analytics.js - GA4 event tracking across all components)
 
 ---
 
-## Implementation Order (Recommended)
+## Phase 5: Dark Mode - Sprint 5 (Weeks 1-2)
 
-### Sprint 1: Core UX (Week 1) - COMPLETED
-1. [x] Analyze current implementation
-2. [x] 1.2 Stepper-based word entry
-3. [x] 1.3 Auto-save functionality
-4. [x] 1.4 Word input improvements
+> PRD: FR-008, FR-009, FR-010 | US-006
 
-### Sprint 2: Onboarding & Associations (Week 2) - COMPLETED
-5. [x] 1.1 Welcome/onboarding modal
-6. [x] 2.1 Simplify association screen
-7. [x] 2.3 Better association input
-8. [x] 2.4 Progress & completion improvements
+### 5.1 Theme Infrastructure
+- [ ] Add `darkMode: 'class'` to `tailwind.config.js`
+- [ ] Create `src/utils/theme.js` utility for theme detection and persistence
+- [ ] Detect OS color scheme via `prefers-color-scheme` media query on load
+- [ ] Persist user preference to localStorage key `alignment32-theme`
+- [ ] Apply `dark` class to `<html>` element based on resolved preference
 
-### Sprint 3: Visual Design (Week 3) - COMPLETED
-9. [x] 3.1 Color system (brand colors, category colors in tailwind.config.js)
-10. [x] 3.2 Typography (Inter font, improved hierarchy)
-11. [x] 3.3 Component restyling (all 6 components updated)
-12. [x] 3.4 Micro-interactions (animations, hover effects, glow shadows)
+### 5.2 Theme Toggle UI
+- [ ] Add theme toggle button to app header (sun/moon icon)
+- [ ] Toggle cycles: system default → light → dark → system default
+- [ ] Show current mode indicator (icon changes to reflect active theme)
+- [ ] Ensure toggle is accessible (ARIA label, keyboard operable)
 
-### Sprint 4: Mobile & Polish (Week 4) - COMPLETED
+### 5.3 Component Dark Variants
+- [ ] Update `style.css` with dark mode base styles (background, text colors)
+- [ ] HomeScreen: dark card backgrounds, adjusted shadows, readable text
+- [ ] WordEntry: dark input fields, category color adjustments for dark backgrounds
+- [ ] Association: dark word cards, input field contrast
+- [ ] SessionDetail: dark read-only view styling
+- [ ] WelcomeModal: dark modal backdrop and content
+- [ ] StepIndicator: ensure category colors remain distinguishable on dark backgrounds
+- [ ] BottomSheet: dark variant styling
 
-#### Phase A: Mobile Optimization
-13. [x] Increase touch targets to 44x44px minimum (back buttons, delete, step indicators, modal dots)
-14. [x] Add sticky header to Association.vue (match WordEntry pattern)
-15. [x] Add sticky header to SessionDetail.vue
-16. [x] Improve thumb reach zones (primary CTAs positioned at bottom on mobile)
-17. [x] Collapsible word review sections in WordEntry review step (already existed)
-18. [x] Lazy load confetti library (dynamic import)
-19. [x] Add smooth scroll behavior (CSS)
-
-#### Phase B: Session Management
-20. [x] Add `name` field to session data model (default: "Session {formatted date}")
-21. [x] Inline editable session name on HomeScreen (click to edit, blur/Enter to save)
-22. [x] Show word preview on session cards (3-4 sample words)
-
-#### Phase C: Accessibility & PWA
-23. [x] Add ARIA labels to all icon buttons (back, delete, close)
-24. [x] Add aria-live regions for dynamic updates (draft saved, progress)
-25. [x] Implement modal focus trapping in WelcomeModal
-26. [x] Add aria-current="step" to active step in StepIndicator
-27. [x] Color contrast audit (WCAG AA compliance) - uses Tailwind standard colors
-28. [x] Keyboard navigation verification (Tab through all elements)
-29. [x] Create SVG logo (mandala design with 4-fold symmetry, category colors)
-30. [x] Install and configure vite-plugin-pwa (full offline support)
-31. [x] Generate PWA icons (192x192, 512x512, apple-touch-icon)
-32. [x] Update favicon and index.html with new logo
+### 5.4 Dark Mode Validation
+- [ ] Verify all category colors (Amber, Blue, Rose, Lavender) pass WCAG AA contrast on dark backgrounds
+- [ ] Test gradient buttons and glow effects in dark mode
+- [ ] Verify confetti animation visibility on dark background
+- [ ] Test on mobile (both iOS dark mode and Android dark mode)
 
 ---
 
-## Files to Create/Modify
+## Phase 6: Session Sharing & Export - Sprint 5 (Weeks 1-2)
 
-### New Components
-- `src/components/WelcomeModal.vue` - CREATED (Sprint 2)
-- `src/components/StepIndicator.vue` - CREATED
-- `src/components/CategoryStep.vue` - (integrated into WordEntry.vue)
-- `src/components/WordCard.vue`
-- `src/components/ToastNotification.vue`
-- `src/utils/storage.js` - CREATED (debounce + localStorage utilities)
+> PRD: FR-011, FR-012, FR-013 | US-007
 
-### Modified Components
-- `src/App.vue` - Add welcome modal, toast system - UPDATED (Sprint 2 + Sprint 3 gradient background)
-- `src/components/HomeScreen.vue` - Draft indicators, session actions - UPDATED (Sprint 3 visual redesign)
-- `src/components/WordEntry.vue` - Complete redesign (stepper) - UPDATED (Sprint 3 category colors)
-- `src/components/Association.vue` - Simplify, one pair at a time - UPDATED (Sprint 2 + Sprint 3 visual redesign)
-- `src/components/SessionDetail.vue` - Export options, better layout - UPDATED (Sprint 3 visual redesign)
-- `src/components/WelcomeModal.vue` - UPDATED (Sprint 3 visual redesign)
-- `src/components/StepIndicator.vue` - UPDATED (Sprint 3 brand colors)
-- `src/style.css` - UPDATED (Sprint 3 micro-interactions, scrollbar, focus styles)
+### 6.1 URL Encoding Engine
+- [ ] Create `src/utils/share.js` with encode/decode functions
+- [ ] Implement session data → JSON → deflate → base64url encoding pipeline
+- [ ] Implement reverse: base64url → inflate → JSON → session data
+- [ ] Add data validation on decode (handle malformed/corrupted URLs gracefully)
+- [ ] Verify encoded URL stays under 2000 characters for typical sessions
+- [ ] Unit-test encode/decode round-trip with sample session data
 
-### Configuration
-- `tailwind.config.js` - UPDATED (Sprint 3 custom colors, fonts, shadows, animations)
-- `index.html` - UPDATED (Sprint 3 Inter font, Sprint 4 PWA meta tags, new favicon)
-- `vite.config.js` - UPDATED (Sprint 4 vite-plugin-pwa configuration)
+### 6.2 Share UI
+- [ ] Add "Share" button to SessionDetail.vue (completed sessions only)
+- [ ] Generate shareable URL on button click
+- [ ] Copy generated URL to clipboard automatically (with feedback toast)
+- [ ] Show URL preview / "Link copied!" confirmation
+- [ ] Add `navigator.share()` Web Share API as progressive enhancement (mobile)
 
-### Assets (Sprint 4)
-- `public/logo.svg` - CREATED (mandala design with 4-fold symmetry)
-- `public/icon-192.png` - CREATED (PWA icon)
-- `public/icon-512.png` - CREATED (PWA icon)
-- `public/apple-touch-icon.png` - CREATED (iOS home screen)
-- `public/favicon.png` - CREATED (browser tab)
+### 6.3 Shared Session View
+- [ ] Add URL hash/query parameter route handling in App.vue
+- [ ] Parse encoded session from URL on app load
+- [ ] Render shared session in read-only SessionDetail view
+- [ ] Show "Shared Session" indicator (distinct from user's own sessions)
+- [ ] Show error state for invalid/corrupted share links with clear messaging
+- [ ] Add "Try Alignment32" CTA on shared view (link to create own session)
 
----
-
-## Success Metrics
-
-- [ ] User can understand the purpose within 30 seconds (onboarding)
-- [ ] Word entry completion rate increases (less abandonment)
-- [ ] Mobile users can complete full session comfortably
-- [ ] Session completion time reduced by 20%
-- [ ] User satisfaction (if feedback mechanism added)
+### 6.4 Clipboard Copy
+- [ ] Add "Copy Final Word" button to SessionDetail.vue
+- [ ] Add "Copy Journey Summary" option (formatted text with all rounds)
+- [ ] Use `navigator.clipboard.writeText()` with fallback for older browsers
+- [ ] Show toast confirmation on successful copy
 
 ---
 
-## Previous Roadmap Items (Preserved)
+## Phase 7: Insights & Analytics Dashboard - Sprint 6 (Weeks 3-4)
 
-### High Priority
-- [ ] Add test framework (Vitest) with component tests
+> PRD: FR-014, FR-015, FR-016 | US-008, US-009
 
-### Medium Priority
-- [ ] Export/import sessions (JSON download/upload)
-- [ ] Session sharing via URL (encoded state or shareable links)
+### 7.1 User-Facing Word Insights
+- [ ] Create `src/components/InsightsView.vue` component
+- [ ] Add "Insights" navigation option on HomeScreen (visible when 2+ completed sessions)
+- [ ] Add `'insights'` view state to App.vue routing
+- [ ] Word frequency analysis: show most-used words across all sessions
+- [ ] Category contribution analysis: which categories produce final-round words most often
+- [ ] Visual representations (simple bar charts or word cloud using CSS/canvas)
+- [ ] Session-over-time view: show final words chronologically to reveal evolution
 
-### Low Priority / Ideas
-- [ ] Advanced analytics on word patterns
-- [ ] Custom category definitions (user-defined instead of fixed 4)
-- [ ] Multi-language support (i18n)
-- [ ] Dark mode toggle
-- [ ] Undo/redo during association phase
+### 7.2 Product Analytics Enhancement
+- [ ] Extend existing `analytics.js` to track share URL generation events
+- [ ] Track dark mode toggle events and preference distribution
+- [ ] Track insights view engagement (page views, time spent)
+- [ ] Add session abandonment tracking (started but never completed, with phase info)
+- [ ] Ensure all analytics respect privacy (no PII, anonymized identifiers)
+
+### 7.3 Image Export
+- [ ] Add "Export as Image" button to SessionDetail.vue
+- [ ] Generate shareable card image (final word + journey summary)
+- [ ] Use Canvas API or html2canvas library for image generation
+- [ ] Support PNG download with branded styling (logo, colors)
+- [ ] Optimize for social media sharing dimensions (1200x630 or square)
 
 ---
 
-## Future Considerations
+## Phase 8: Testing & Launch Preparation - Sprints 7-8 (Weeks 5-8)
 
-Features intentionally deferred for future evaluation:
+> PRD: NFRs (Performance, Browser Compatibility) | Backlog: Test Framework
 
-### Mobile Enhancements
-- [ ] Swipe gestures between steps (requires gesture library like Hammer.js or VueUse)
+### 8.1 Test Framework Setup
+- [ ] Install Vitest and @vue/test-utils as dev dependencies
+- [ ] Configure Vitest in `vite.config.js`
+- [ ] Add `npm run test` and `npm run test:watch` scripts to package.json
+- [ ] Create test directory structure matching `src/` layout
+
+### 8.2 Critical Path Tests
+- [ ] Test word entry validation (duplicates, empty, character limits)
+- [ ] Test association pairing algorithm (correct pairs, round progression, final word)
+- [ ] Test session CRUD (create, read, update name, delete)
+- [ ] Test auto-save and draft resume flow
+- [ ] Test share URL encode/decode round-trip
+- [ ] Test theme detection and toggle persistence
+
+### 8.3 Performance Optimization
+- [ ] Run Lighthouse audit and address any scores below 90
+- [ ] Verify bundle size under 200KB gzipped
+- [ ] Test First Contentful Paint < 1 second on throttled 4G
+- [ ] Optimize any large dependencies (tree-shaking, lazy loading)
+
+### 8.4 Cross-Browser QA
+- [ ] Test on Chrome (desktop + Android)
+- [ ] Test on Safari (desktop + iOS)
+- [ ] Test on Firefox (desktop)
+- [ ] Test on Edge (desktop)
+- [ ] Verify PWA installation on Android and iOS
+- [ ] Verify offline functionality across browsers
+
+### 8.5 Launch Checklist
+- [ ] Final WCAG AA accessibility audit
+- [ ] Update README.md with new features (dark mode, sharing, insights)
+- [ ] Update AGENTS.md with new components and utilities
+- [ ] Verify all analytics events firing correctly
+- [ ] Address any npm audit security vulnerabilities
+- [ ] Production build and deployment verification
+
+---
+
+## Future
+
+> Nice-to-have items outside current scope. Revisit after Sprint 8.
+
+### UX Enhancements
+- [ ] Drag-and-drop word pairing (user chooses which words to associate)
+- [ ] "Stuck? Get a hint" AI suggestion for associations
+- [ ] Swipe gestures between steps (Hammer.js or VueUse integration)
 - [ ] Pull-to-refresh for session list
 - [ ] Bottom sheet patterns for mobile inputs
-- [ ] Haptic feedback on mobile (Web Vibration API)
+- [ ] Undo/redo during association phase
 
-### Analytics & Tracking
-- [ ] Google Analytics integration (page views, session completion rates)
-- [ ] Event tracking (word entry completion, association merges, time spent)
+### Session Features
+- [ ] Session duplication (start fresh with same initial words)
+- [ ] Edit/restart completed sessions from association phase
+- [ ] Session templates (pre-defined word sets for guided exercises)
+- [ ] Export/import sessions as JSON (backup/restore)
+- [ ] Export full journey as PDF
 
-### Advanced Session Features
-- [ ] Session duplication (start fresh with same words)
-- [ ] Edit/restart completed sessions from associations phase
-- [ ] Session templates (pre-defined word sets for specific use cases)
-
----
-
-## Notes
-
-- Preserve existing functionality while improving UX
-- Test each phase before moving to next
-- Prioritize mobile experience
-- Keep bundle size reasonable
-- Consider dark mode in future iteration
+### Platform
+- [ ] Custom category definitions (user-defined instead of fixed 4)
+- [ ] Multi-language support (i18n)
+- [ ] Error boundaries for graceful component failure recovery
+- [ ] Advanced word pattern analytics across sessions
