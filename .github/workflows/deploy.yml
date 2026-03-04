@@ -23,6 +23,8 @@ jobs:
 
       - name: Build the project
         run: npm run build
+        env:
+          VITE_GA_MEASUREMENT_ID: ${{ secrets.VITE_GA_MEASUREMENT_ID }}
 
       - name: Copy CNAME file to dist
         run: cp CNAME dist/
