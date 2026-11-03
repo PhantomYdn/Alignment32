@@ -1,10 +1,18 @@
 # Alignment32 - Personal Word Alignment App
 
-A Vue 3 web application that guides users through a systematic word alignment process to discover their personal core values through structured word association.
+Distill 32 words that matter to you into the one word that matters most. A private, offline-capable self-reflection practice for the browser and phone.
+
+**Try it:** https://alignment32.orienteer.org/
 
 ## About
 
-Alignment32 helps users discover their personal alignment through a structured word reduction process. Starting with 32 meaningful words across 4 life categories, users progressively merge and associate words until they reach a single word that represents their core alignment.
+Alignment32 is a structured alternative to freeform journaling. You write 8 words for each of 4 dimensions of your life: Physical, Mental, Emotional and Spiritual. The app then pairs the groups and asks you to merge each pair of words into a new word that connects them for you. Round by round the 32 words shrink to 16, 8, 4, 2 and finally 1. That final word, and the path that led to it, is a snapshot of what you are aligned around right now.
+
+It is built for people who like concrete exercises over abstract reflection: run it once for a first discovery, then again every few months to see how your alignment shifts. Every merge is your own choice, so the journey says as much as the result.
+
+When a session is complete you can hand the whole journey to an AI of your choice. The app builds a ready-made prompt with your 32 words, every association and the final word, and lets you copy it or open it directly in ChatGPT or Claude for a reflection, open questions and small practices to try.
+
+Everything stays on your device. There is no account, no backend and nothing is sent anywhere unless you choose to paste the prompt somewhere.
 
 ## Demo
 
@@ -89,6 +97,8 @@ npm run build
 - ✅ Read-only viewing of completed sessions
 - ✅ Responsive design for desktop and mobile
 - ✅ Intuitive step-by-step guidance
+- ✅ "Ask an AI" prompt: copy or open your full journey in ChatGPT / Claude
+- ✅ Installable PWA, works offline
 
 ## Data Privacy
 All your words and sessions are stored locally in your browser. Nothing is sent to external servers, ensuring your personal word journey remains completely private.
