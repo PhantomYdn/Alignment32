@@ -6,6 +6,10 @@ A Vue 3 web application that guides users through a systematic word alignment pr
 
 Alignment32 helps users discover their personal alignment through a structured word reduction process. Starting with 32 meaningful words across 4 life categories, users progressively merge and associate words until they reach a single word that represents their core alignment.
 
+## Demo
+
+https://github.com/user-attachments/assets/db45ce17-b311-4ad9-ab45-84333e42e8ba
+
 ## How It Works
 
 ### The Process
