@@ -269,6 +269,9 @@
         >
           Complete Session
         </button>
+        <div class="mt-8 text-left">
+          <AskAiPanel :session="aiSession" from-screen="final-word" />
+        </div>
       </div>
       </div>
     </div>
@@ -316,12 +319,17 @@
 <script>
 import analytics from '../utils/analytics.js'
 import { pulseMedium, celebration as hapticCelebration } from '../utils/haptics.js'
+import { initialWordsFromHistory } from '../utils/aiPrompt.js'
+import AskAiPanel from './AskAiPanel.vue'
 
 // Lazy load confetti only when needed
 let confetti = null
 
 export default {
   name: 'Association',
+  components: {
+    AskAiPanel
+  },
   props: {
     groups: {
       type: Array,
@@ -356,6 +364,14 @@ export default {
     }
   },
   computed: {
+    aiSession() {
+      return {
+        initialWords: initialWordsFromHistory(this.initialWordHistory),
+        associations: this.allAssociations,
+        finalWord: this.finalWord,
+        createdAt: new Date().toISOString()
+      }
+    },
     currentPairs() {
       const pairs = []
       for (let i = 0; i < this.currentGroups.length; i += 2) {

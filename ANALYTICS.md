@@ -81,6 +81,13 @@ Or use [GA4 DebugView](https://support.google.com/analytics/answer/7201382):
 | `view_session_detail` | User views completed session | `session_id` |
 | `navigation_back` | User navigates back | `from_screen` |
 
+### Ask an AI
+
+| Event | Trigger | Parameters |
+|-------|---------|------------|
+| `ai_prompt_copied` | User copies the AI prompt | `from_screen` |
+| `ai_opened` | User opens the prompt in ChatGPT or Claude | `provider`, `from_screen` |
+
 ---
 
 ## GA4 Configuration Guide
@@ -98,6 +105,7 @@ Go to **Admin > Custom definitions > Create custom dimensions/metrics**.
 | Category Name | `category_name` | Event |
 | Session Status | `session_status` | Event |
 | From Screen | `from_screen` | Event |
+| Provider | `provider` | Event |
 
 **Custom Metrics** (numeric):
 

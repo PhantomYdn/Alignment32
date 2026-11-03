@@ -51,6 +51,11 @@
         </div>
       </div>
 
+      <!-- Ask an AI -->
+      <div v-if="session.finalWord" class="mb-6">
+        <AskAiPanel :session="session" from-screen="session-detail" />
+      </div>
+
       <!-- Word History -->
       <div v-if="session.wordHistory && session.wordHistory.length > 0" class="space-y-4 sm:space-y-5">
         <h2 class="text-xl sm:text-2xl font-bold text-gray-700 mb-4 tracking-tight">Word Journey</h2>
@@ -129,9 +134,13 @@
 
 <script>
 import analytics from '../utils/analytics.js'
+import AskAiPanel from './AskAiPanel.vue'
 
 export default {
   name: 'SessionDetail',
+  components: {
+    AskAiPanel
+  },
   props: {
     session: {
       type: Object,

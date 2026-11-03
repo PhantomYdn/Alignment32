@@ -298,6 +298,32 @@ function navigationBack(fromScreen) {
 }
 
 // ============================================================================
+// Analytics API - Ask an AI
+// ============================================================================
+
+/**
+ * Track copying the AI prompt to clipboard
+ * @param {string} fromScreen - 'session-detail' or 'final-word'
+ */
+function aiPromptCopied(fromScreen) {
+  trackEvent('ai_prompt_copied', {
+    from_screen: fromScreen
+  })
+}
+
+/**
+ * Track opening the prompt in an AI provider
+ * @param {string} provider - 'chatgpt' or 'claude'
+ * @param {string} fromScreen - 'session-detail' or 'final-word'
+ */
+function aiOpened(provider, fromScreen) {
+  trackEvent('ai_opened', {
+    provider,
+    from_screen: fromScreen
+  })
+}
+
+// ============================================================================
 // Export
 // ============================================================================
 
@@ -329,6 +355,10 @@ export default {
   // Engagement
   viewSessionDetail,
   navigationBack,
+
+  // Ask an AI
+  aiPromptCopied,
+  aiOpened,
   
   // Timer utilities (for components that need manual timing)
   startTimer,

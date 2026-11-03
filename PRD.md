@@ -56,6 +56,7 @@ The app is distributed as a PWA for web browsers and as native mobile applicatio
 | PWA / offline support | P1 | Installable app with full offline functionality | Done |
 | Mobile optimization | P1 | Sticky headers, 44px touch targets, thumb-reach CTAs | Done |
 | Accessibility (WCAG AA) | P1 | ARIA labels, focus trapping, keyboard navigation, screen reader support | Done |
+| Ask an AI | P1 | Prompt with all 32 words and associations: copy to clipboard or open prefilled in ChatGPT / Claude. Template in `src/utils/aiPrompt.js` | Done |
 
 ### Planned (Next Phase)
 
