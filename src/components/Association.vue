@@ -115,7 +115,7 @@
                       type="text"
                       maxlength="30"
                       :placeholder="idx === currentWordIndex ? 'Type your association...' : 'Your association'"
-                      class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 focus:shadow-md hover:shadow-sm transition-all text-center font-medium placeholder:text-gray-300"
+                      class="flex-1 min-w-0 px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 focus:shadow-md hover:shadow-sm transition-all text-center font-medium placeholder:text-gray-300"
                       @input="onAssociationInput"
                       @focus="currentWordIndex = idx"
                       @keydown.enter="focusNextInput(idx)"
