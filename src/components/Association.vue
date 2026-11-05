@@ -87,21 +87,19 @@
                       : 'border-gray-200 bg-gray-50'
                 ]"
               >
-                <!-- Word pair display -->
-                <div class="flex items-center justify-center gap-3 mb-3">
-                  <div class="flex-1 text-center">
-                    <span class="inline-block px-4 py-2 bg-physical-100 text-physical-700 rounded-xl font-semibold text-sm sm:text-base border border-physical-200">
+                <!-- Word pair display: compact centered row, wraps as "word1 +" / "word2" when long -->
+                <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 mb-3">
+                  <div class="inline-flex items-center gap-3 min-w-0 max-w-full">
+                    <span class="min-w-0 max-w-full break-words text-center px-4 py-2 bg-physical-100 text-physical-700 rounded-xl font-semibold text-sm sm:text-base border border-physical-200">
                       {{ wordPair.word1 }}
                     </span>
+                    <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                      <span class="text-gray-400 font-bold text-lg">+</span>
+                    </div>
                   </div>
-                  <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                    <span class="text-gray-400 font-bold text-lg">+</span>
-                  </div>
-                  <div class="flex-1 text-center">
-                    <span class="inline-block px-4 py-2 bg-mental-100 text-mental-700 rounded-xl font-semibold text-sm sm:text-base border border-mental-200">
-                      {{ wordPair.word2 }}
-                    </span>
-                  </div>
+                  <span class="min-w-0 max-w-full break-words text-center px-4 py-2 bg-mental-100 text-mental-700 rounded-xl font-semibold text-sm sm:text-base border border-mental-200">
+                    {{ wordPair.word2 }}
+                  </span>
                 </div>
 
                 <!-- Association input -->
